@@ -1,4 +1,5 @@
 import { Vector3 } from './Vector3.js';
+import { Euler } from './Euler.js';
 
 var _v1 = new Vector3();
 var _m1 = new Matrix4();
@@ -20,9 +21,15 @@ var _z = new Vector3();
  * @author bhouston / http://clara.io
  * @author WestLangley / http://github.com/WestLangley
  */
-
+/**
+ * Matrix4对象的构造函数.用来创建一个4x4矩阵.Matrix4对象的功能函数采用定义构造的函数原型对象来实现,实际就是一个数组
+ * https://www.cnblogs.com/cxchanpin/p/6852938.html
+ */
 function Matrix4() {
-
+	// 给定矩阵的初始值
+	// 结合设置Matrix4的原型中set函数，可看出这个转置矩阵，前4个数为矩阵的第一列，依次类推，最后4个数为第4列。
+	// 因此在使用中用到的是这个矩阵的转置矩阵
+	// 为何三给空间的变换要采用4维矩阵，参见https://www.zhihu.com/question/26655998/answer/43847213
 	this.elements = [
 
 		1, 0, 0, 0,
@@ -39,11 +46,38 @@ function Matrix4() {
 	}
 
 }
+// 设置Matrix4的原型
+
 
 Object.assign( Matrix4.prototype, {
 
 	isMatrix4: true,
 
+	/**
+	 * set方法用来设置Matrix4(4x4矩阵)的元素值.并返回当前Matrix4(4x4矩阵)
+	 * 传参顺序为行1的4个数，行2的4个数，行3的4个数，行4的4个数
+	 * 矩阵中第1组4个数是列1，第2组4个数是列2，第3组4个数是列3，第4组4个数是列4
+	 * 使用方法: var m = new Matrix4();
+	 * m.set(11, 12, 13, 14, 21, 22, 23, 24, 31, 32, 33, 34, 41, 42, 43, 44);
+	 *
+	 * @param {number} n11
+	 * @param {number} n12
+	 * @param {number} n13
+	 * @param {number} n14
+	 * @param {number} n21
+	 * @param {number} n22
+	 * @param {number} n23
+	 * @param {number} n24
+	 * @param {number} n31
+	 * @param {number} n32
+	 * @param {number} n33
+	 * @param {number} n34
+	 * @param {number} n41
+	 * @param {number} n42
+	 * @param {number} n43
+	 * @param {number} n44
+	 * @returns {this}
+	 */
 	set: function ( n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33, n34, n41, n42, n43, n44 ) {
 
 		var te = this.elements;
@@ -57,6 +91,13 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
+	/**
+	 * identity方法用来获得一个4x4矩阵的单位矩阵。
+	 * 在矩阵的乘法中。有一种矩阵起着特殊的作用，如同数的乘法中的1,我们称这样的矩阵为单位矩阵
+	 * 它是个方阵，它的主对角线（从左上角到右下角的对角线）上的元素均为1以外全都为0
+	 * 对于单位矩阵E。有AE=EA=A
+	 * @returns {this} 当前矩阵
+	 */
 	identity: function () {
 
 		this.set(
@@ -72,12 +113,21 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
+	/**
+	 * clone方法用来复制当前4x4矩阵的元素值.并返回新的Matrix4(4x4矩阵).
+	 * @returns {Matrix4}
+	 */
 	clone: function () {
 
 		return new Matrix4().fromArray( this.elements );
 
 	},
 
+	/**
+	 * copy方法用来复制一个4x4矩阵的元素值，到当前Matrix4(4x4矩阵)中，并返回当前Matrix4(4x4矩阵)。
+	 * @param {Matrix4} m 4x4矩阵
+	 * @returns {Matrix4} 当前4x4矩阵
+	 */
 	copy: function ( m ) {
 
 		var te = this.elements;
@@ -92,6 +142,11 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
+	/**
+	 * copyPosition方法用来复制參数m(4x4矩阵)的平移分量（矩阵m的最后列的前3项的值），到当前Matrix4(4x4矩阵)中，并返回当前Matrix4(4x4矩阵).
+	 * @param {Matrix4} m
+	 * @returns {Matrix4} 当前4x4矩阵
+	 */
 	copyPosition: function ( m ) {
 
 		var te = this.elements, me = m.elements;
@@ -104,6 +159,14 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
+	/**
+	 * 抽取基本值，将当前矩阵的第一列前3个值赋值给xAxis，第二列前3个值赋值给yAxis，第三列前3个值赋值给zAxis
+	 * 并返回当前Matrix4(4x4矩阵)。
+	 * @param {Vector3} xAxis
+	 * @param {Vector3} yAxis
+	 * @param {Vector3} zAxis
+	 * @return {this}
+	 */
 	extractBasis: function ( xAxis, yAxis, zAxis ) {
 
 		xAxis.setFromMatrixColumn( this, 0 );
@@ -114,6 +177,14 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
+	/**
+	 * 设置基本值，根据传入的参数设置当前矩阵的基本值
+	 * 并返回当前Matrix4(4x4矩阵)。
+	 * @param {Vector3} xAxis
+	 * @param {Vector3} yAxis
+	 * @param {Vector3} zAxis
+	 * @return {this} 返回当前Matrix4(4x4矩阵)。
+	 */
 	makeBasis: function ( xAxis, yAxis, zAxis ) {
 
 		this.set(
@@ -127,6 +198,12 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
+	/**
+	 * extractRotation方法用来提取參数m(4x4矩阵)的旋转分量.并返回新的Matrix4(4x4矩阵).
+	 * 使当前矩阵成为旋转矩阵，用于旋转变换
+	 * @param {Matrix4} m
+	 * @return {this} 返回当前Matrix4(4x4矩阵)。
+	 */
 	extractRotation: function ( m ) {
 
 		// this method does not support reflection matrices
@@ -134,6 +211,7 @@ Object.assign( Matrix4.prototype, {
 		var te = this.elements;
 		var me = m.elements;
 
+		// 求出三个坐标轴方向的向量长度的倒数。
 		var scaleX = 1 / _v1.setFromMatrixColumn( m, 0 ).length();
 		var scaleY = 1 / _v1.setFromMatrixColumn( m, 1 ).length();
 		var scaleZ = 1 / _v1.setFromMatrixColumn( m, 2 ).length();
@@ -162,6 +240,11 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
+	/**
+	 * makeRotationFromEuler方法通过欧拉角(參数euler)对当前Matrix4(4x4矩阵)设置旋转矩阵.
+	 * @param {Euler} euler 欧拉角
+	 * @returns {Matrix4} 当前4x4矩阵
+	 */
 	makeRotationFromEuler: function ( euler ) {
 
 		if ( ! ( euler && euler.isEuler ) ) {
@@ -275,12 +358,12 @@ Object.assign( Matrix4.prototype, {
 
 		}
 
-		// bottom row
+		// bottom row 最下的一行
 		te[ 3 ] = 0;
 		te[ 7 ] = 0;
 		te[ 11 ] = 0;
 
-		// last column
+		// last column 最后一列
 		te[ 12 ] = 0;
 		te[ 13 ] = 0;
 		te[ 14 ] = 0;
@@ -290,12 +373,31 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
+	/**
+	 *
+	 * @param {Quaternion} q
+	 * @returns {Matrix4} 当前4x4矩阵
+	 */
+	/**
+	 * makeRotationFromQuaternion方法通过四元数(參数q)对当前Matrix4(4x4矩阵)设置旋转矩阵.
+	 * @param {Quaternion} q
+	 * @returns {Matrix4} 当前4x4矩阵
+	 */
 	makeRotationFromQuaternion: function ( q ) {
 
+		// _zero = (0,0,0)
+		// _one = (1,1,1)
 		return this.compose( _zero, q, _one );
 
 	},
 
+	/**
+	 * lookAt(eye,center,up)将对象设定为一个视图矩阵。參数都是Vector3对象，该矩阵仅仅会用到eye和center的相对位置。
+	 * @param {*} eye 表示相机位置的Vector3三维向量
+	 * @param {*} target 表示目标的Vector3三维向量
+	 * @param {*} up 表示向上的Vector3三维向量
+	 * @returns {this} 返回当前Matrix4(4x4矩阵)
+	 */
 	lookAt: function ( eye, target, up ) {
 
 		var te = this.elements;
@@ -343,6 +445,12 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
+	/**
+	 * multiply方法用来将当前Matrix4(4x4矩阵)与參数m相乘（m右乘当前Matrix4）.并返回当前Matrix4(4x4矩阵)
+	 * @param {Matrix4} m 与当前对象元素值相乘的Matrix4(4x4矩阵)
+	 * @param {Matrix4} n 推断是否有第二个參数w,假设有的话,调用.multiplyMatrices()方法
+	 * @returns {this} 返回当前Matrix4(4x4矩阵)
+	 */
 	multiply: function ( m, n ) {
 
 		if ( n !== undefined ) {
@@ -356,12 +464,24 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
+	/**
+	 * m左乘当前Matrix4(4x4矩阵)
+	 * @param {Matrix4} m
+	 * @returns {this} 返回当前Matrix4(4x4矩阵)
+	 */
 	premultiply: function ( m ) {
 
+		// 在现有的矩阵上进行变换，两个矩阵相乘，更新的矩阵Matrix4(4x4矩阵)
 		return this.multiplyMatrices( m, this );
 
 	},
 
+	/**
+	 * multiplyMatrices方法用来将矩阵a,b相乘,并返回当前Matrix4(4x4矩阵).
+	 * @param {Matrix4} a
+	 * @param {Matrix4} b
+	 * @returns {this} 返回当前Matrix4(4x4矩阵)
+	 */
 	multiplyMatrices: function ( a, b ) {
 
 		var ae = a.elements;
@@ -378,6 +498,7 @@ Object.assign( Matrix4.prototype, {
 		var b31 = be[ 2 ], b32 = be[ 6 ], b33 = be[ 10 ], b34 = be[ 14 ];
 		var b41 = be[ 3 ], b42 = be[ 7 ], b43 = be[ 11 ], b44 = be[ 15 ];
 
+		// 矩阵a左乘b
 		te[ 0 ] = a11 * b11 + a12 * b21 + a13 * b31 + a14 * b41;
 		te[ 4 ] = a11 * b12 + a12 * b22 + a13 * b32 + a14 * b42;
 		te[ 8 ] = a11 * b13 + a12 * b23 + a13 * b33 + a14 * b43;
@@ -415,6 +536,11 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
+	/**
+	 * determinant方法用来获得Matrix4(4x4矩阵)的行列式
+	 * 通过求解行列式值的方式来推断矩阵的逆矩阵是否存在(行列式的值不等于0,表示该矩阵有逆矩阵).
+	 * @returns {number} 行列式值
+	 */
 	determinant: function () {
 
 		var te = this.elements;
@@ -465,6 +591,10 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
+	/**
+	 * transpose方法用来获得Matrix4(4x4矩阵)的转置矩阵.
+	 * @returns {this} 返回当前Matrix4(4x4矩阵)
+	 */
 	transpose: function () {
 
 		var te = this.elements;
@@ -482,6 +612,13 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
+	/**
+	 * setPosition方法用来将参数（x,y,z）或三维向量x设置到当前矩阵中代表位置,并返回当前Matrix4(4x4矩阵).
+	 * @param {Vector3|number} x
+	 * @param {number} y
+	 * @param {number} z
+	 * @returns {this} 返回当前Matrix4(4x4矩阵)
+	 */
 	setPosition: function ( x, y, z ) {
 
 		var te = this.elements;
@@ -504,6 +641,12 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
+	/**
+	 * getInverse方法用来获得参数Matrix4(4x4矩阵)m的逆矩阵.
+	 * @param {Matrix4} m 原矩阵
+	 * @param {*} throwOnDegenerate 是否报错
+	 * @returns {this}
+	 */
 	getInverse: function ( m, throwOnDegenerate ) {
 
 		// based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm
@@ -566,6 +709,11 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
+	/**
+	 * scale方法通过预先计算比例向量，将指定的比例向量应用到此 Matrix4(4x4矩阵)。
+	 * @param {Vector3} v
+	 * @returns {this} 返回当前Matrix4(4x4矩阵)
+	 */
 	scale: function ( v ) {
 
 		var te = this.elements;
@@ -580,6 +728,10 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
+	/**
+	 * 获取三个轴方向的最大比例
+	 * @returns {number} 返回最大比例值
+	 */
 	getMaxScaleOnAxis: function () {
 
 		var te = this.elements;
@@ -592,6 +744,14 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
+	/**
+	 * makeTranslation方法依据x, y, z生成平移矩阵.
+	 * 用法：左乘目标向量，实现向量平移
+	 * @param {number} x
+	 * @param {number} y
+	 * @param {number} z
+	 * @returns {this} 返回当前Matrix4(4x4矩阵)
+	 */
 	makeTranslation: function ( x, y, z ) {
 
 		this.set(
@@ -607,6 +767,12 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
+	/**
+	 * makeRotationX方法生成绕x轴转theta弧度的旋转矩阵
+	 * 用法：左乘目标向量，实现向量旋转
+	 * @param {number} theta 旋转弧度
+	 * @returns {this} 返回当前Matrix4(4x4矩阵)
+	 */
 	makeRotationX: function ( theta ) {
 
 		var c = Math.cos( theta ), s = Math.sin( theta );
@@ -624,6 +790,12 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
+	/**
+	 * makeRotationX方法生成绕y轴转theta弧度的旋转矩阵
+	 * 用法：左乘目标向量，实现向量旋转
+	 * @param {number} theta 旋转弧度
+	 * @returns {this} 返回当前Matrix4(4x4矩阵)
+	 */
 	makeRotationY: function ( theta ) {
 
 		var c = Math.cos( theta ), s = Math.sin( theta );
@@ -641,6 +813,12 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
+	/**
+	 * makeRotationX方法生成绕z轴转theta弧度的旋转矩阵
+	 * 用法：左乘目标向量，实现向量旋转
+	 * @param {number} theta 旋转弧度
+	 * @returns {this} 返回当前Matrix4(4x4矩阵)
+	 */
 	makeRotationZ: function ( theta ) {
 
 		var c = Math.cos( theta ), s = Math.sin( theta );
@@ -658,6 +836,13 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
+	/**
+	 * makeRotationAxis方法生成绕随意轴转angle弧度的旋转矩阵
+	 * 用法：左乘目标向量，实现向量旋转
+	 * @param {Vector3} axis 转轴向量(axis必须是单位向量)
+	 * @param {number} angle 旋转弧度
+	 * @returns {this} 返回当前Matrix4(4x4矩阵)
+	 */
 	makeRotationAxis: function ( axis, angle ) {
 
 		// Based on http://www.gamedev.net/reference/articles/article1199.asp
@@ -681,6 +866,14 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
+	/**
+	 * makeScale方法依据x, y, z生成缩放矩阵.
+	 * 用法：左乘目标向量，实现向量缩放
+	 * @param {number} x
+	 * @param {number} y
+	 * @param {number} z
+	 * @returns {this} 返回当前Matrix4(4x4矩阵)
+	 */
 	makeScale: function ( x, y, z ) {
 
 		this.set(
@@ -696,6 +889,14 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
+	/**
+	 * makeShear方法依据x, y, z生成剪切矩阵.
+	 * 用法：左乘目标向量，实现向量剪切
+	 * @param {number} x
+	 * @param {number} y
+	 * @param {number} z
+	 * @returns {this} 返回当前Matrix4(4x4矩阵)
+	 */
 	makeShear: function ( x, y, z ) {
 
 		this.set(
@@ -711,6 +912,13 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
+	/**
+	 * compose方法根据参数设置当前变换矩阵的平移、旋转和缩放设置
+	 * @param {Vector3} position 平移向量
+	 * @param {Quaternion} quaternion 旋转四元数
+	 * @param {Vector3} scale 缩放向量
+	 * @returns {this} Matrix4当前4x4矩阵
+	 */
 	compose: function ( position, quaternion, scale ) {
 
 		var te = this.elements;
@@ -738,6 +946,7 @@ Object.assign( Matrix4.prototype, {
 		te[ 10 ] = ( 1 - ( xx + yy ) ) * sz;
 		te[ 11 ] = 0;
 
+		// 最后一列
 		te[ 12 ] = position.x;
 		te[ 13 ] = position.y;
 		te[ 14 ] = position.z;
@@ -747,6 +956,14 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
+	/**
+	 * decompose方法将矩阵的平移、旋转和缩放分量分离
+	 * 分离结果分别放在参数中
+	 * @param {Vector3} position 平移分量
+	 * @param {Quaternion} quaternion 旋转四元数
+	 * @param {Vector3} scale 缩放
+	 * @returns {this} Matrix4当前4x4矩阵
+	 */
 	decompose: function ( position, quaternion, scale ) {
 
 		var te = this.elements;
@@ -756,6 +973,7 @@ Object.assign( Matrix4.prototype, {
 		var sz = _v1.set( te[ 8 ], te[ 9 ], te[ 10 ] ).length();
 
 		// if determine is negative, we need to invert one scale
+		// 假设行列式是负数,把比例转换成正数
 		var det = this.determinant();
 		if ( det < 0 ) sx = - sx;
 
@@ -764,6 +982,7 @@ Object.assign( Matrix4.prototype, {
 		position.z = te[ 14 ];
 
 		// scale the rotation part
+		// 缩放有关旋转的元素
 		_m1.copy( this );
 
 		var invSX = 1 / sx;
@@ -792,6 +1011,16 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
+	/**
+	 * makePerspective方法依据left, right, bottom, top, near, far生成透视投影矩阵
+	 * @param {number} left 指明相对于垂直平面的左侧坐标位置
+	 * @param {number} right 指明相对于垂直平面的右侧坐标位置
+	 * @param {number} top 指明相对于垂直平面的顶部坐标位置
+	 * @param {number} bottom 指明相对于垂直平面的底部坐标位置
+	 * @param {number} near 指明相对于深度剪切面的近的距离，必须为正数
+	 * @param {number} far 指明相对于深度剪切面的远的距离，必须为正数
+	 * @returns {this} Matrix4当前4x4矩阵
+	 */
 	makePerspective: function ( left, right, top, bottom, near, far ) {
 
 		if ( far === undefined ) {
@@ -818,6 +1047,16 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
+	/**
+	 * makePerspective方法依据left, right, bottom, top, near, far生成正交投影矩阵
+	 * @param {number} left 指明相对于垂直平面的左侧坐标位置
+	 * @param {number} right 指明相对于垂直平面的右侧坐标位置
+	 * @param {number} top 指明相对于垂直平面的顶部坐标位置
+	 * @param {number} bottom 指明相对于垂直平面的底部坐标位置
+	 * @param {number} near 指明相对于深度剪切面的近的距离，必须为正数
+	 * @param {number} far 指明相对于深度剪切面的远的距离，必须为正数
+	 * @returns {this} Matrix4当前4x4矩阵
+	 */
 	makeOrthographic: function ( left, right, top, bottom, near, far ) {
 
 		var te = this.elements;
@@ -838,6 +1077,11 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
+	/**
+	 * 判断传入的矩阵是否与当前矩阵相等
+	 * @param {Matrix} matrix
+	 * @returns {boolean} 判断结果（true or false）
+	 */
 	equals: function ( matrix ) {
 
 		var te = this.elements;
@@ -853,6 +1097,12 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
+	/**
+	 * fromArray方法将存储Matrix4(4x4矩阵)元素值的数组赋值给当前Matrix4(4x4矩阵)对象
+	 * @param {number[]} array Matrix4(4x4矩阵)元素值的数组array
+	 * @param {number} offset 偏移量
+	 * @returns {this} Matrix4当前4x4矩阵
+	 */
 	fromArray: function ( array, offset ) {
 
 		if ( offset === undefined ) offset = 0;
@@ -867,6 +1117,12 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
+	/**
+	 * toArray方法将当前Matrix4(4x4矩阵)的元素值赋值给数组array.返回一个数组对象.
+	 * @param {number[]} array 用来存储当前Matrix4(4x4矩阵)元素值的数组
+	 * @param {number} offset 偏移量
+	 * @returns {number[]} 数组对象
+	 */
 	toArray: function ( array, offset ) {
 
 		if ( array === undefined ) array = [];

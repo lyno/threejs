@@ -6,7 +6,17 @@
  */
 
 import { MathUtils } from './MathUtils.js';
-
+/**
+ * Quaternion对象的构造函数.用来创建一个四元数对象.Quaternion对象的功能函数采用定义构造的函数原型对象来实现
+ * 四元数是一种高阶复数，四元数q表示为：q =(x,y ,z ,w)=xi+yj+zk+w
+ * 齐次,是一种用来解决变换等操作的快捷方法.w称为齐次。三维空间的点(x,y,z)，用四维向量表示成(x,y,z,1)和(x,y,z,0)是不一样的，前者可以用变换矩阵实现平移等操作，后者不能。
+ * 齐次坐标在图形学中是一个非常基础的概念，例如3D场景映射到2D场景的过程中
+ * 齐次的作用见https://blog.csdn.net/janestar/article/details/44244849
+ * @param {number} x
+ * @param {number} y
+ * @param {number} z
+ * @param {number} w
+ */
 function Quaternion( x, y, z, w ) {
 
 	this._x = x || 0;
@@ -15,9 +25,16 @@ function Quaternion( x, y, z, w ) {
 	this._w = ( w !== undefined ) ? w : 1;
 
 }
-
+// 此处设置的是Quaternion的静态方法可以用Quaternion.<方法名>的形式调用
 Object.assign( Quaternion, {
 
+	/**
+	 * slerp方法就是球形插值，通过t值从当前四元数到qb之间进行球形插值。
+	 * @param {Quaternion} qa
+	 * @param {Quaternion} qb
+	 * @param {Quaternion} qm
+	 * @param {Quaternion} t
+	 */
 	slerp: function ( qa, qb, qm, t ) {
 
 		return qm.copy( qa ).slerp( qb, t );
@@ -412,6 +429,9 @@ Object.assign( Quaternion.prototype, {
 
 	},
 
+	/**
+	 * 反转此四元数。
+	 */
 	inverse: function () {
 
 		// quaternion is assumed to have unit length
@@ -420,6 +440,9 @@ Object.assign( Quaternion.prototype, {
 
 	},
 
+	/**
+	 * 共轭
+	 */
 	conjugate: function () {
 
 		this._x *= - 1;
@@ -432,6 +455,10 @@ Object.assign( Quaternion.prototype, {
 
 	},
 
+	/**
+	 *
+	 * @param {Quaternion} v
+	 */
 	dot: function ( v ) {
 
 		return this._x * v._x + this._y * v._y + this._z * v._z + this._w * v._w;
@@ -497,6 +524,11 @@ Object.assign( Quaternion.prototype, {
 
 	},
 
+	/**
+	 * 将此四元数设置为a x b
+	 * @param {Quaternion} a
+	 * @param {Quaternion} b
+	 */
 	multiplyQuaternions: function ( a, b ) {
 
 		// from http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/code/index.htm
@@ -515,6 +547,12 @@ Object.assign( Quaternion.prototype, {
 
 	},
 
+	/**
+	 * slerp方法就是球形插值，通过t值从当前四元数到qb之间进行球形插值。
+	 * @param {Quaternion} qb 四元数对象参数qb(x,y,z,w)
+	 * @param {number} t 权值 t 必须是标量,取值范围是0.0-1.0
+	 * @returns {this}
+	 */
 	slerp: function ( qb, t ) {
 
 		if ( t === 0 ) return this;
@@ -585,12 +623,22 @@ Object.assign( Quaternion.prototype, {
 
 	},
 
+	/**
+	 * equals方法判断两个四元数是否相等，相当于比较运算符===,将当前四元数和参数v中的(x,y,z,w)值进行对比,返回bool型值.
+	 * @param {Quaternion} quaternion 四元数(x,y,z,w)
+	 * @returns 返回true or false
+	 */
 	equals: function ( quaternion ) {
 
 		return ( quaternion._x === this._x ) && ( quaternion._y === this._y ) && ( quaternion._z === this._z ) && ( quaternion._w === this._w );
 
 	},
 
+	/**
+	 * fromArray方法将存储四元数(x,y,z,w)值的数组赋值给当前四元数对象
+	 * @param {number[]} array
+	 * @param {number} offset
+	 */
 	fromArray: function ( array, offset ) {
 
 		if ( offset === undefined ) offset = 0;
@@ -606,6 +654,11 @@ Object.assign( Quaternion.prototype, {
 
 	},
 
+	/**
+	 * toArray方法将当前四元数对象的属性赋值给数组array[0.5,0.5,0.5,1].返回一个数组对象
+	 * @param {*} array
+	 * @param {*} offset
+	 */
 	toArray: function ( array, offset ) {
 
 		if ( array === undefined ) array = [];

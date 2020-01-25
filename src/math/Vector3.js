@@ -271,6 +271,11 @@ Object.assign( Vector3.prototype, {
 
 	},
 
+	/**
+	 * 方法提供了将参数m(变换矩阵)左乘当前向量，并将结果赋值给当前向量，实现变换。
+	 * @param {Matrix4} m 变换矩阵
+	 * @returns {this} 当前Vector3向量
+	 */
 	applyMatrix4: function ( m ) {
 
 		var x = this.x, y = this.y, z = this.z;
@@ -451,7 +456,7 @@ Object.assign( Vector3.prototype, {
 		return this;
 
 	},
-
+	// 点积, 是相应单位向量夹角的余弦值。
 	dot: function ( v ) {
 
 		return this.x * v.x + this.y * v.y + this.z * v.z;
