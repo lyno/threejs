@@ -185,7 +185,10 @@ export class Object3D extends EventDispatcher {
 	applyQuaternion( quaternion: Quaternion ): this;
 
 	/**
-	 *
+	 * 通过四元数的方式旋转任意坐标轴(参数axis)旋转角度(参数angle),最后将结果返回到this.quternion属性中
+	 * @param {Vector3}} axis 转轴向量(axis必须是单位向量)
+	 * @param {number} angle 旋转弧度
+	 * @returns {undefined}
 	 */
 	setRotationFromAxisAngle( axis: Vector3, angle: number ): void;
 

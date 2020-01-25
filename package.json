@@ -28,7 +28,7 @@
   },
   "eslintConfig": {
     "parser": "@typescript-eslint/parser",
-    "extends": "mdcs",
+    // "extends": "mdcs",
     "plugins": [
       "html",
       "@typescript-eslint"
