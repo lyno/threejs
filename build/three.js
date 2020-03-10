@@ -96,7 +96,7 @@
 		};
 
 	}
-
+	// constants.js
 	var REVISION = '113dev';
 	var MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 	var TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
@@ -285,7 +285,7 @@
 	/**
 	 * https://github.com/mrdoob/eventdispatcher.js/
 	 */
-
+	// ./../core/EventDispatcher.js
 	function EventDispatcher() {}
 
 	Object.assign( EventDispatcher.prototype, {
@@ -1428,6 +1428,7 @@
 
 	var _canvas;
 
+	// ./extras/ImageUtils.js
 	var ImageUtils = {
 
 		getDataURL: function ( image ) {
@@ -1487,6 +1488,7 @@
 
 	var textureId = 0;
 
+	// ./textures/Texture.js
 	function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding ) {
 
 		Object.defineProperty( this, 'id', { value: textureId ++ } );

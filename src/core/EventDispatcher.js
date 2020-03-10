@@ -67,7 +67,7 @@ Object.assign( EventDispatcher.prototype, {
 		if ( listenerArray !== undefined ) {
 
 			event.target = this;
-
+			// 不知为啥复制一份
 			var array = listenerArray.slice( 0 );
 
 			for ( var i = 0, l = array.length; i < l; i ++ ) {

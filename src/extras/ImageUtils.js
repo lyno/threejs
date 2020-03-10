@@ -8,6 +8,10 @@ var _canvas;
 
 var ImageUtils = {
 
+	/**
+	 * 将图片转化为DataURL
+	 * @param {*} image 
+	 */
 	getDataURL: function ( image ) {
 
 		var canvas;
