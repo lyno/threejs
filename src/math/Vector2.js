@@ -237,6 +237,10 @@ Object.assign( Vector2.prototype, {
 
 	},
 
+	/**
+	 * 将此向量乘以Matrix3类型的参数m，以进行向量变换。
+	 * @param {Matrix3} m 
+	 */
 	applyMatrix3: function ( m ) {
 
 		var x = this.x, y = this.y;
@@ -340,42 +344,66 @@ Object.assign( Vector2.prototype, {
 
 	},
 
+	/**
+	 * Vector2.Dot也叫点积，它返回1个-1.0～1.0之间的一个值。
+	 * 表示返回进行Dot计算的两个向量之间的夹角的余弦值(Cos弧度角).要注意的是能进行Dot计算的前提是两个向量首先要变成单位向量！
+	 * @param {Vector2} v 
+	 */
 	dot: function ( v ) {
 
 		return this.x * v.x + this.y * v.y;
 
 	},
 
+	/**
+	 * 叉积
+	 * @param {Vector2} v 
+	 */
 	cross: function ( v ) {
 
 		return this.x * v.y - this.y * v.x;
 
 	},
 
+	/**
+	 * 点（x,y）与原点间距离的平方
+	 */
 	lengthSq: function () {
 
 		return this.x * this.x + this.y * this.y;
 
 	},
 
+	/**
+	 * 点（x,y）与原点间距离
+	 */
 	length: function () {
 
 		return Math.sqrt( this.x * this.x + this.y * this.y );
 
 	},
 
+	/**
+	 * 曼哈顿长度：出租车几何或曼哈顿距离（Manhattan Distance）是由十九世纪的赫尔曼·闵可夫斯基所创词汇 ，是种使用在几何度量空间的几何学用语，用以标明两个点在标准坐标系上的绝对轴距总和。
+	 */
 	manhattanLength: function () {
 
 		return Math.abs( this.x ) + Math.abs( this.y );
 
 	},
 
+	/**
+	 * 向量的归一化， 将当前向量变成长度为1的向量
+	 */
 	normalize: function () {
 
 		return this.divideScalar( this.length() || 1 );
 
 	},
 
+	/**
+	 * 原点O到点（x,y）射线与x轴正向的夹角
+	 */
 	angle: function () {
 
 		// computes the angle in radians with respect to the positive x-axis
@@ -413,6 +441,11 @@ Object.assign( Vector2.prototype, {
 
 	},
 
+	/**
+	 * 线性插值
+	 * @param {Vector2} v 
+	 * @param {number} alpha 0，1）之间的一个值
+	 */
 	lerp: function ( v, alpha ) {
 
 		this.x += ( v.x - this.x ) * alpha;
@@ -422,6 +455,12 @@ Object.assign( Vector2.prototype, {
 
 	},
 
+	/**
+	 * 线性插值
+	 * @param {Vector2} v1 
+	 * @param {Vector2} v2 
+	 * @param {number} alpha （0，1）之间的一个值
+	 */
 	lerpVectors: function ( v1, v2, alpha ) {
 
 		return this.subVectors( v2, v1 ).multiplyScalar( alpha ).add( v1 );
@@ -434,6 +473,11 @@ Object.assign( Vector2.prototype, {
 
 	},
 
+	/**
+	 * 从数组中获取向量的坐标值
+	 * @param {Array} array 
+	 * @param {number} offset 数据下标索引值，整数
+	 */
 	fromArray: function ( array, offset ) {
 
 		if ( offset === undefined ) offset = 0;
@@ -445,6 +489,11 @@ Object.assign( Vector2.prototype, {
 
 	},
 
+	/**
+	 * 将向量的坐标值保存在数组中
+	 * @param {Array} array 
+	 * @param {number} offset 数据下标索引值，整数
+	 */
 	toArray: function ( array, offset ) {
 
 		if ( array === undefined ) array = [];
@@ -472,6 +521,11 @@ Object.assign( Vector2.prototype, {
 
 	},
 
+	/**
+	 * 当前向量围绕中心点center旋转逆时针旋转angle弧度。得到一个新的值
+	 * @param {Vector2} center 
+	 * @param {number} angle 
+	 */
 	rotateAround: function ( center, angle ) {
 
 		var c = Math.cos( angle ), s = Math.sin( angle );

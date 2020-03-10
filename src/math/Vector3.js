@@ -273,6 +273,7 @@ Object.assign( Vector3.prototype, {
 
 	/**
 	 * 方法提供了将参数m(变换矩阵)左乘当前向量，并将结果赋值给当前向量，实现变换。
+	 * 矩阵中最下面一行为缩放因子;
 	 * @param {Matrix4} m 变换矩阵
 	 * @returns {this} 当前Vector3向量
 	 */
@@ -291,6 +292,10 @@ Object.assign( Vector3.prototype, {
 
 	},
 
+	/**
+	 * applyQuaternion方法应用一个四元数变换到当前三维向量
+	 * @param {Quaternion} q 
+	 */
 	applyQuaternion: function ( q ) {
 
 		var x = this.x, y = this.y, z = this.z;
@@ -456,7 +461,11 @@ Object.assign( Vector3.prototype, {
 		return this;
 
 	},
-	// 点积, 是相应单位向量夹角的余弦值。
+	/**
+	 * 点积, 是相应单位向量夹角的余弦值。
+	 * 通过点积是否大于0，也可以计算可以判断一个物体是否在别一个物体的前方或后方
+	 * @param {Vector3} v 
+	 */
 	dot: function ( v ) {
 
 		return this.x * v.x + this.y * v.y + this.z * v.z;
@@ -511,6 +520,14 @@ Object.assign( Vector3.prototype, {
 
 	},
 
+	/**
+	 * 叉积：即两个向量的叉积得到的还是向量！ c=aXb
+	 * 则有如下三个性质1.向量C垂直于向量a和b所在的平面。
+	 * 2.模长|c| = |a||b|sin<a,b>
+	 * 3.满足右手法则
+	 * @param {Vector3} v 
+	 * @param {Vector3} w 
+	 */
 	cross: function ( v, w ) {
 
 		if ( w !== undefined ) {
@@ -524,6 +541,11 @@ Object.assign( Vector3.prototype, {
 
 	},
 
+	/**
+	 * 叉积：
+	 * @param {Vector3} a 
+	 * @param {Vector3} b 
+	 */
 	crossVectors: function ( a, b ) {
 
 		var ax = a.x, ay = a.y, az = a.z;
@@ -537,16 +559,25 @@ Object.assign( Vector3.prototype, {
 
 	},
 
+	/**
+	 * projectOnVector方法在将当前三维向量(x,y,z)投影一个向量到另一个向量,参数Vector3(x,y,z).
+	 * @param {Vector3} v 
+	 */
 	projectOnVector: function ( v ) {
 
 		// v cannot be the zero v
-
+		// 进行Dot计算的前提是两个向量首先要变成单位向量.
 		var scalar = v.dot( this ) / v.lengthSq();
 
 		return this.copy( v ).multiplyScalar( scalar );
 
 	},
 
+	/**
+	 * projectOnPlane方法在将当前三维向量(x,y,z)投影一个向量到一个平面(用一个向量表示,参数planeNormal(x,y,z)),然后当前向量减去
+	 * 从这个向量到这个向量到平面法线的投影.
+	 * @param {Vector3} planeNormal 
+	 */
 	projectOnPlane: function ( planeNormal ) {
 
 		_vector.copy( this ).projectOnVector( planeNormal );
@@ -555,6 +586,11 @@ Object.assign( Vector3.prototype, {
 
 	},
 
+	/**
+	 * reflect方法沿着法线(参数normal)反射向量
+	 * 其实就是对一个向量进行镜像.
+	 * @param {Vector3} normal 
+	 */
 	reflect: function ( normal ) {
 
 		// reflect incident vector off plane orthogonal to normal
@@ -564,6 +600,10 @@ Object.assign( Vector3.prototype, {
 
 	},
 
+	/**
+	 * angleTo方法返回当前向量与另一个向量的夹角.
+	 * @param {Vector3} v 
+	 */
 	angleTo: function ( v ) {
 
 		var denominator = Math.sqrt( this.lengthSq() * v.lengthSq() );
@@ -578,6 +618,10 @@ Object.assign( Vector3.prototype, {
 
 	},
 
+	/**
+	 * distanceTo方法将返回当前三维向量到参数v的距离(只读).
+	 * @param {*} v 
+	 */
 	distanceTo: function ( v ) {
 
 		return Math.sqrt( this.distanceToSquared( v ) );
@@ -598,12 +642,22 @@ Object.assign( Vector3.prototype, {
 
 	},
 
+	/**
+	 * Spherical
+	 * @param {Spherical} s 
+	 */
 	setFromSpherical: function ( s ) {
 
 		return this.setFromSphericalCoords( s.radius, s.phi, s.theta );
 
 	},
 
+	/**
+	 * 设置为球坐标
+	 * @param {number} radius 
+	 * @param {number} phi 
+	 * @param {number} theta 
+	 */
 	setFromSphericalCoords: function ( radius, phi, theta ) {
 
 		var sinPhiRadius = Math.sin( phi ) * radius;
@@ -616,6 +670,10 @@ Object.assign( Vector3.prototype, {
 
 	},
 
+	/**
+	 * 
+	 * @param {Cylindrical} c 
+	 */
 	setFromCylindrical: function ( c ) {
 
 		return this.setFromCylindricalCoords( c.radius, c.theta, c.y );
@@ -632,6 +690,10 @@ Object.assign( Vector3.prototype, {
 
 	},
 
+	/**
+	 * 从矩阵中表示坐标的元素中获取向量数值
+	 * @param {Matrix4} m 
+	 */
 	setFromMatrixPosition: function ( m ) {
 
 		var e = m.elements;

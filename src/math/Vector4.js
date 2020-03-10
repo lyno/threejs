@@ -258,6 +258,10 @@ Object.assign( Vector4.prototype, {
 
 	},
 
+	/**
+	 * 左乘矩阵
+	 * @param {Matrix4} m 
+	 */
 	applyMatrix4: function ( m ) {
 
 		var x = this.x, y = this.y, z = this.z, w = this.w;
