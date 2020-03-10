@@ -34,7 +34,9 @@ Object.assign( Matrix3.prototype, {
 		te[ 0 ] = n11; te[ 1 ] = n21; te[ 2 ] = n31;
 		te[ 3 ] = n12; te[ 4 ] = n22; te[ 5 ] = n32;
 		te[ 6 ] = n13; te[ 7 ] = n23; te[ 8 ] = n33;
-
+		// te[ 0 ] = n11;te[ 3 ] = n12;te[ 6 ] = n13;
+		// te[ 1 ] = n21;te[ 4 ] = n22;te[ 7 ] = n23;
+		// te[ 2 ] = n31;te[ 5 ] = n32;te[ 8 ] = n33;
 		return this;
 
 	},

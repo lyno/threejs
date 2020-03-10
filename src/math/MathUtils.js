@@ -44,7 +44,7 @@ var MathUtils = {
 
 	// compute euclidian modulo of m % n
 	// https://en.wikipedia.org/wiki/Modulo_operation
-
+	// 计算m％n的欧氏模
 	euclideanModulo: function ( n, m ) {
 
 		return ( ( n % m ) + m ) % m;
@@ -52,7 +52,7 @@ var MathUtils = {
 	},
 
 	// Linear mapping from range <a1, a2> to range <b1, b2>
-
+	// 从范围<a1，a2>到范围<b1，b2>的线性映射,例如线段<a1，a2>上的某点x,映射到线段<b1，b2>上点y的值。
 	mapLinear: function ( x, a1, a2, b1, b2 ) {
 
 		return b1 + ( x - a1 ) * ( b2 - b1 ) / ( a2 - a1 );
@@ -60,15 +60,15 @@ var MathUtils = {
 	},
 
 	// https://en.wikipedia.org/wiki/Linear_interpolation
-
+	// 线性插值
 	lerp: function ( x, y, t ) {
-
+		// return x + t * ( y - x)
 		return ( 1 - t ) * x + t * y;
 
 	},
 
 	// http://en.wikipedia.org/wiki/Smoothstep
-
+	// 平稳步伐
 	smoothstep: function ( x, min, max ) {
 
 		if ( x <= min ) return 0;
@@ -79,7 +79,7 @@ var MathUtils = {
 		return x * x * ( 3 - 2 * x );
 
 	},
-
+	// 平稳步伐
 	smootherstep: function ( x, min, max ) {
 
 		if ( x <= min ) return 0;
@@ -145,6 +145,7 @@ var MathUtils = {
 
 	},
 
+	// 从适当的欧拉设置四元数
 	setQuaternionFromProperEuler: function ( q, a, b, c, order ) {
 
 		// Intrinsic Proper Euler Angles - see https://en.wikipedia.org/wiki/Euler_angles

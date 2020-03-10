@@ -11,6 +11,7 @@ import { MathUtils } from './MathUtils.js';
  * 四元数是一种高阶复数，四元数q表示为：q =(x,y ,z ,w)=xi+yj+zk+w
  * 齐次,是一种用来解决变换等操作的快捷方法.w称为齐次。三维空间的点(x,y,z)，用四维向量表示成(x,y,z,1)和(x,y,z,0)是不一样的，前者可以用变换矩阵实现平移等操作，后者不能。
  * 齐次坐标在图形学中是一个非常基础的概念，例如3D场景映射到2D场景的过程中
+ * 齐次主要研究欧氏空间和透视空间坐标的关系，
  * 齐次的作用见https://blog.csdn.net/janestar/article/details/44244849
  * @param {number} x
  * @param {number} y
@@ -213,6 +214,11 @@ Object.assign( Quaternion.prototype, {
 
 	},
 
+	/**
+	 * 根据由Euler角度指定的旋转设置此四元数。
+	 * @param {Euler} euler 
+	 * @param {boolean} update 
+	 */
 	setFromEuler: function ( euler, update ) {
 
 		if ( ! ( euler && euler.isEuler ) ) {
@@ -307,6 +313,10 @@ Object.assign( Quaternion.prototype, {
 
 	},
 
+	/**
+	 * 
+	 * @param {Matrix4} m 
+	 */
 	setFromRotationMatrix: function ( m ) {
 
 		// http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm
@@ -525,7 +535,8 @@ Object.assign( Quaternion.prototype, {
 	},
 
 	/**
-	 * 将此四元数设置为a x b
+	 * 将此四元数设置为a x b, 两个四元数表达式的普通展开
+	 * (qaw+qaxi+qayj+qazk)(qbw+qbxi+qbyj+qbzk)
 	 * @param {Quaternion} a
 	 * @param {Quaternion} b
 	 */
