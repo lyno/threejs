@@ -17,7 +17,12 @@ var _vbc = new Vector3();
 var _vap = new Vector3();
 var _vbp = new Vector3();
 var _vcp = new Vector3();
-
+/**
+ * 由三个点生成一个三角形
+ * @param {Vector3} a 
+ * @param {Vector3} c 
+ * @param {Vector3} b 
+ */
 function Triangle( a, b, c ) {
 
 	this.a = ( a !== undefined ) ? a : new Vector3();
@@ -28,6 +33,13 @@ function Triangle( a, b, c ) {
 
 Object.assign( Triangle, {
 
+	/**
+	 * 计算三角形的法线向量
+	 * @param {Vector3} a 
+	 * @param {Vector3} b 
+	 * @param {Vector3} c 
+	 * @param {Vector3} target 
+	 */
 	getNormal: function ( a, b, c, target ) {
 
 		if ( target === undefined ) {
@@ -54,6 +66,15 @@ Object.assign( Triangle, {
 
 	// static/instance method to calculate barycentric coordinates
 	// based on: http://www.blackpawn.com/texts/pointinpoly/default.html
+	/**
+	 * 计算返回参数a,b,c所组成的三角形所在的平面上任意点(参数point)所表示三角形顶点的加权平均值
+	 * 这个权值就是重心坐标
+	 * @param {Vector3} point 
+	 * @param {Vector3} a 
+	 * @param {Vector3} b 
+	 * @param {Vector3} c 
+	 * @param {Vector3} target 
+	 */
 	getBarycoord: function ( point, a, b, c, target ) {
 
 		_v0.subVectors( c, a );
@@ -93,6 +114,13 @@ Object.assign( Triangle, {
 
 	},
 
+	/**
+	 * 判断任意点(参数point)是否在a,b,c所组成的三角形内
+	 * @param {Vector3} point 
+	 * @param {Vector3} a 
+	 * @param {Vector3} b 
+	 * @param {Vector3} c 
+	 */
 	containsPoint: function ( point, a, b, c ) {
 
 		Triangle.getBarycoord( point, a, b, c, _v3 );
@@ -101,6 +129,17 @@ Object.assign( Triangle, {
 
 	},
 
+	/**
+	 * 
+	 * @param {*} point 
+	 * @param {*} p1 
+	 * @param {*} p2 
+	 * @param {*} p3 
+	 * @param {*} uv1 
+	 * @param {*} uv2 
+	 * @param {*} uv3 
+	 * @param {*} target 
+	 */
 	getUV: function ( point, p1, p2, p3, uv1, uv2, uv3, target ) {
 
 		this.getBarycoord( point, p1, p2, p3, _v3 );
@@ -138,6 +177,13 @@ Object.assign( Triangle.prototype, {
 
 	},
 
+	/**
+	 * 通过数组和索引设置三角平面
+	 * @param {*} points 
+	 * @param {*} i0 
+	 * @param {*} i1 
+	 * @param {*} i2 
+	 */
 	setFromPointsAndIndices: function ( points, i0, i1, i2 ) {
 
 		this.a.copy( points[ i0 ] );
@@ -164,6 +210,9 @@ Object.assign( Triangle.prototype, {
 
 	},
 
+	/**
+	 * 计算三角形面积
+	 */
 	getArea: function () {
 
 		_v0.subVectors( this.c, this.b );
@@ -173,6 +222,10 @@ Object.assign( Triangle.prototype, {
 
 	},
 
+	/**
+	 * 计算三角形中心
+	 * @param {Vector3} target 
+	 */
 	getMidpoint: function ( target ) {
 
 		if ( target === undefined ) {
@@ -186,12 +239,20 @@ Object.assign( Triangle.prototype, {
 
 	},
 
+	/**
+	 * 计算三角形的法向量
+	 * @param {Vector3} target 
+	 */
 	getNormal: function ( target ) {
 
 		return Triangle.getNormal( this.a, this.b, this.c, target );
 
 	},
 
+	/**
+	 * 创建三角形共面的平面Plane对象
+	 * @param {Vector3} target 
+	 */
 	getPlane: function ( target ) {
 
 		if ( target === undefined ) {
@@ -205,6 +266,12 @@ Object.assign( Triangle.prototype, {
 
 	},
 
+	/**
+	 * 计算返回当前三角形所在的平面上任意点(参数point)所表示当前三角形顶点的加权平均值
+	 * 这个权值就是重心坐标
+	 * @param {Vector3} point 
+	 * @param {Vector3} target 
+	 */
 	getBarycoord: function ( point, target ) {
 
 		return Triangle.getBarycoord( point, this.a, this.b, this.c, target );

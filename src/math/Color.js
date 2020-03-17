@@ -32,6 +32,12 @@ var _colorKeywords = { 'aliceblue': 0xF0F8FF, 'antiquewhite': 0xFAEBD7, 'aqua': 
 var _hslA = { h: 0, s: 0, l: 0 };
 var _hslB = { h: 0, s: 0, l: 0 };
 
+/**
+ * 构造颜色类 参数可以是一个数字,表示一个颜色值，也可以三个数字，分别 是RGB
+ * @param {number} r 
+ * @param {number?} g 
+ * @param {number?} b 
+ */
 function Color( r, g, b ) {
 
 	if ( g === undefined && b === undefined ) {
@@ -45,6 +51,12 @@ function Color( r, g, b ) {
 
 }
 
+/**
+ * 将hsl颜色转换成rgb颜色值,根据第三个参数计算rgb的值
+ * @param {*} p 
+ * @param {*} q 
+ * @param {*} t 
+ */
 function hue2rgb( p, q, t ) {
 
 	if ( t < 0 ) t += 1;
@@ -74,6 +86,10 @@ Object.assign( Color.prototype, {
 
 	r: 1, g: 1, b: 1,
 
+	/**
+	 * 将颜色对象, 16进制颜色值，rgb颜色值复制给当前实例
+	 * @param {Color|number|string} value 
+	 */
 	set: function ( value ) {
 
 		if ( value && value.isColor ) {
@@ -104,6 +120,10 @@ Object.assign( Color.prototype, {
 
 	},
 
+	/**
+	 * 设置16进制颜色值给当前实例
+	 * @param {number} hex 
+	 */
 	setHex: function ( hex ) {
 
 		hex = Math.floor( hex );
@@ -126,6 +146,12 @@ Object.assign( Color.prototype, {
 
 	},
 
+	/**
+	 * 设置h,s,l颜色值给当前实例
+	 * @param {number} h 
+	 * @param {number} s 
+	 * @param {number} l 
+	 */
 	setHSL: function ( h, s, l ) {
 
 		// h,s,l ranges are in 0.0 - 1.0
@@ -152,6 +178,11 @@ Object.assign( Color.prototype, {
 
 	},
 
+	/**
+	 * 通过参数style传递不同的rgb颜色值表示类型给当前实例,列出了以下5种样式
+	 * 不支持Alpha
+	 * @param {string} style 
+	 */
 	setStyle: function ( style ) {
 
 		function handleAlpha( string ) {
@@ -269,6 +300,10 @@ Object.assign( Color.prototype, {
 
 	},
 
+	/**
+	 * 通过英文名设置颜色
+	 * @param {string} style 
+	 */
 	setColorName: function ( style ) {
 
 		// color keywords
@@ -306,6 +341,12 @@ Object.assign( Color.prototype, {
 
 	},
 
+	/**
+	 * 用 Color 提供的实例设置对象的颜色。颜色是由伽马色彩空间转换到线性色彩空间得来的。
+	 * 伽马色彩空间也使用 RGB 颜色，但是会使用指数系数而不是线性系数。
+	 * @param {Color} color 
+	 * @param {number} gammaFactor 
+	 */
 	copyGammaToLinear: function ( color, gammaFactor ) {
 
 		if ( gammaFactor === undefined ) gammaFactor = 2.0;
@@ -332,6 +373,10 @@ Object.assign( Color.prototype, {
 
 	},
 
+	/**
+	 * 将当前颜色从伽马色彩空间转换到线性色彩空间。
+	 * @param {number} gammaFactor 
+	 */
 	convertGammaToLinear: function ( gammaFactor ) {
 
 		this.copyGammaToLinear( this, gammaFactor );
@@ -384,12 +429,20 @@ Object.assign( Color.prototype, {
 
 	},
 
+	/**
+	 * 获取颜色值
+	 * @returns {number}
+	 */
 	getHex: function () {
 
 		return ( this.r * 255 ) << 16 ^ ( this.g * 255 ) << 8 ^ ( this.b * 255 ) << 0;
 
 	},
 
+	/**
+	 * 获取颜色16进制字符串
+	 * @returns {string}
+	 */
 	getHexString: function () {
 
 		return ( '000000' + this.getHex().toString( 16 ) ).slice( - 6 );

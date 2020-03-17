@@ -13,6 +13,11 @@ var _normal = new Vector3();
  * @author bhouston / http://clara.io
  */
 
+ /**
+  * 创建一个原点为origin,方向为direction的射线
+  * @param {Vector3} origin 射线起点
+  * @param {Vector3} direction 射线方向向量
+  */
 function Ray( origin, direction ) {
 
 	this.origin = ( origin !== undefined ) ? origin : new Vector3();
@@ -46,6 +51,11 @@ Object.assign( Ray.prototype, {
 
 	},
 
+	/**
+	 * 当前射线方向的从起端点起长度为t的点
+	 * @param {float} t 
+	 * @param {Vector3} target 
+	 */
 	at: function ( t, target ) {
 
 		if ( target === undefined ) {
@@ -59,6 +69,10 @@ Object.assign( Ray.prototype, {
 
 	},
 
+	/**
+	 * 设置射线的方向
+	 * @param {Vector3} v 
+	 */
 	lookAt: function ( v ) {
 
 		this.direction.copy( v ).sub( this.origin ).normalize();
@@ -67,6 +81,11 @@ Object.assign( Ray.prototype, {
 
 	},
 
+	/**
+	 * 设置射线的起点为距原起点射线方向长度为t的点
+	 * 调用at(t)方法返回沿当前射线方向的从端点起长度为t的点,并将返回的点设为端点
+	 * @param {number} t 到端点的长度
+	 */
 	recast: function ( t ) {
 
 		this.origin.copy( this.at( t, _vector ) );
@@ -75,6 +94,11 @@ Object.assign( Ray.prototype, {
 
 	},
 
+	/**
+	 * 返回任意点point到射线上的垂足
+	 * @param {Vector3} point 
+	 * @param {Vector3} target 
+	 */
 	closestPointToPoint: function ( point, target ) {
 
 		if ( target === undefined ) {
@@ -89,7 +113,7 @@ Object.assign( Ray.prototype, {
 		var directionDistance = target.dot( this.direction );
 
 		if ( directionDistance < 0 ) {
-
+			// 若point与射线的夹角大于90度，则垂足不在射线上，则返回起点。
 			return target.copy( this.origin );
 
 		}
@@ -104,6 +128,10 @@ Object.assign( Ray.prototype, {
 
 	},
 
+	/**
+	 * 计算点point到射线的垂足（见closestPointToPoint）的距离的平方
+	 * @param {Vector3} point 
+	 */
 	distanceSqToPoint: function ( point ) {
 
 		var directionDistance = _vector.subVectors( point, this.origin ).dot( this.direction );
@@ -122,6 +150,13 @@ Object.assign( Ray.prototype, {
 
 	},
 
+	/**
+	 * 返回有参数v0,v1组成的线段到当前射线的最小距离
+	 * @param {Vector3} v0 
+	 * @param {Vector3} v1 
+	 * @param {Vector3} optionalPointOnRay 
+	 * @param {Vector3} optionalPointOnSegment 
+	 */
 	distanceSqToSegment: function ( v0, v1, optionalPointOnRay, optionalPointOnSegment ) {
 
 		// from http://www.geometrictools.com/GTEngine/Include/Mathematics/GteDistRaySegment.h
@@ -241,6 +276,11 @@ Object.assign( Ray.prototype, {
 
 	},
 
+	/**
+	 * 当前射线是否与参数sphere球体相交,相交返回交点，否则返回false
+	 * @param {Sphere} sphere 
+	 * @param {Vector3} target 
+	 */
 	intersectSphere: function ( sphere, target ) {
 
 		_vector.subVectors( sphere.center, this.origin );
@@ -271,12 +311,22 @@ Object.assign( Ray.prototype, {
 
 	},
 
+	/**
+	 * 当前射线是否与参数sphere球体相交,返回true 或 false
+	 * @param {Sphere} sphere 
+	 * @returns {boolean} 
+	 */
 	intersectsSphere: function ( sphere ) {
 
 		return this.distanceSqToPoint( sphere.center ) <= ( sphere.radius * sphere.radius );
 
 	},
 
+	/**
+	 * 当前射线是与参数plane平面的距离
+	 * @param {Plane} plane 
+	 * @returns {number}
+	 */
 	distanceToPlane: function ( plane ) {
 
 		var denominator = plane.normal.dot( this.direction );
@@ -304,6 +354,12 @@ Object.assign( Ray.prototype, {
 
 	},
 
+	/**
+	 * 当前射线是否与参数plane平面相交, 如果相交，返回交点
+	 * @param {Plane} plane 
+	 * @param {Vector3} target 
+	 * @returns {Nnll|Vector3}
+	 */
 	intersectPlane: function ( plane, target ) {
 
 		var t = this.distanceToPlane( plane );
@@ -318,6 +374,11 @@ Object.assign( Ray.prototype, {
 
 	},
 
+	/**
+	 * 当前射线是否与参数plane平面相交
+	 * @param {Plane} plane
+	 * @returns {boolean} 
+	 */
 	intersectsPlane: function ( plane ) {
 
 		// check if the ray lies on the plane first
@@ -343,7 +404,11 @@ Object.assign( Ray.prototype, {
 		return false;
 
 	},
-
+	/**
+	 * 判断当前射线是与参数box相交
+	 * @param {Box3} box 
+	 * @returns {Nnll|Vector3}
+	 */
 	intersectBox: function ( box, target ) {
 
 		var tmin, tmax, tymin, tymax, tzmin, tzmax;
@@ -413,12 +478,26 @@ Object.assign( Ray.prototype, {
 
 	},
 
+	/**
+	 * 判断当前射线是与参数box相交
+	 * @param {Box3} box 
+	 * @returns {boolean}
+	 */
 	intersectsBox: function ( box ) {
 
 		return this.intersectBox( box, _vector ) !== null;
 
 	},
 
+	/**
+	 * 计算当前射线和 a ,b ,c组成的三角形相交的交点
+	 * @param {*} a 
+	 * @param {*} b 
+	 * @param {*} c 
+	 * @param {*} backfaceCulling 
+	 * @param {Vector3} target 
+	 * @returns {Nnll|Vector3}
+	 */
 	intersectTriangle: function ( a, b, c, backfaceCulling, target ) {
 
 		// Compute the offset origin, edges, and normal.

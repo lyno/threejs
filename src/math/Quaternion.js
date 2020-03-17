@@ -13,6 +13,7 @@ import { MathUtils } from './MathUtils.js';
  * 齐次坐标在图形学中是一个非常基础的概念，例如3D场景映射到2D场景的过程中
  * 齐次主要研究欧氏空间和透视空间坐标的关系，
  * 齐次的作用见https://blog.csdn.net/janestar/article/details/44244849
+ * three.js 之 Matrix https://segmentfault.com/a/1190000014613567
  * @param {number} x
  * @param {number} y
  * @param {number} z
@@ -294,6 +295,11 @@ Object.assign( Quaternion.prototype, {
 
 	},
 
+	/**
+	 * 从任意轴的旋转角设置四元数
+	 * @param {Vector3} axis 旋转轴，必须是单位向量
+	 * @param {*} angle 旋转角
+	 */
 	setFromAxisAngle: function ( axis, angle ) {
 
 		// http://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToQuaternion/index.htm
@@ -314,7 +320,7 @@ Object.assign( Quaternion.prototype, {
 	},
 
 	/**
-	 * 
+	 * 从转换矩阵设置四元数数据
 	 * @param {Matrix4} m 
 	 */
 	setFromRotationMatrix: function ( m ) {
@@ -376,6 +382,12 @@ Object.assign( Quaternion.prototype, {
 
 	},
 
+	/**
+	 * setFromUnitVectors方法通过两个三维单位向量Vector3(vFrom,vTo)设置四元数.
+	 * 参数(vFrom,vTo)必须是单位向量,通过调用.normalize()得到单位向量.
+	 * @param {Vector3} vFrom 
+	 * @param {Vector3} vTo 
+	 */
 	setFromUnitVectors: function ( vFrom, vTo ) {
 
 		// assumes direction vectors vFrom and vTo are normalized
@@ -419,6 +431,10 @@ Object.assign( Quaternion.prototype, {
 
 	},
 
+	/**
+	 * 
+	 * @param {Quaternion} q 
+	 */
 	angleTo: function ( q ) {
 
 		return 2 * Math.acos( Math.abs( MathUtils.clamp( this.dot( q ), - 1, 1 ) ) );

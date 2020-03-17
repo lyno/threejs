@@ -11,6 +11,15 @@ import { Plane } from './Plane.js';
 var _sphere = new Sphere();
 var _vector = new Vector3();
 
+/**
+ * 视锥体，主要用于内部渲染器，来确定什么是在相机的视野内，有助于加速渲染过程
+ * @param {Plane} p0 
+ * @param {Plane} p1 
+ * @param {Plane} p2 
+ * @param {Plane} p3 
+ * @param {Plane} p4 
+ * @param {Plane} p5 
+ */
 function Frustum( p0, p1, p2, p3, p4, p5 ) {
 
 	this.planes = [

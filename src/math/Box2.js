@@ -6,6 +6,12 @@ import { Vector2 } from './Vector2.js';
 
 var _vector = new Vector2();
 
+/**
+ * 通过最大max 和最小min 的两个二维向量设置四边平行于坐标轴的靠边四边形
+ * max 和min代表了两个对顶的坐标点
+ * @param {Vector2} min 
+ * @param {Vector2} max 
+ */
 function Box2( min, max ) {
 
 	this.min = ( min !== undefined ) ? min : new Vector2( + Infinity, + Infinity );
@@ -63,6 +69,9 @@ Object.assign( Box2.prototype, {
 
 	},
 
+	/**
+	 * 置空四边形
+	 */
 	makeEmpty: function () {
 
 		this.min.x = this.min.y = + Infinity;
@@ -106,6 +115,13 @@ Object.assign( Box2.prototype, {
 
 	},
 
+	/**
+	 * 通过Vector3对象(point参数)扩展立方体边界的最小值,最大值,min,max坐标值.并返回新的坐标值的立方体边界.
+	 * expandByPoint方法与expandByVector方法都传递一个Vector3对象,
+	 * expandByPoint方法将当前边界的最大值,最小值的x,y坐标对比,获得新的边界
+	 * expandByVector方法将立方体边界的最大值加上参数vector,最小值减去参数vector,
+	 * @param {Vector2}} point 
+	 */
 	expandByPoint: function ( point ) {
 
 		this.min.min( point );
@@ -133,6 +149,11 @@ Object.assign( Box2.prototype, {
 
 	},
 
+	/**
+	 * 判断二维坐标是否在是否在当前盒子（等边四边形）内
+	 * @param {Vector2} point 
+	 * @returns {boolean}
+	 */
 	containsPoint: function ( point ) {
 
 		return point.x < this.min.x || point.x > this.max.x ||
@@ -140,6 +161,10 @@ Object.assign( Box2.prototype, {
 
 	},
 
+	/**
+	 * 判断当前四边形盒子是否包含参数盒子
+	 * @param {Box2} box 
+	 */
 	containsBox: function ( box ) {
 
 		return this.min.x <= box.min.x && box.max.x <= this.max.x &&

@@ -124,6 +124,10 @@ Object.assign( Box3.prototype, {
 
 	},
 
+	/**
+	 * 通过Vector3对象组成的points数组重新设置立方体边界的最小值,最大值,min,max坐标值.并返回新的坐标值的立方体边界.
+	 * @param {Vector3[]} points 
+	 */
 	setFromPoints: function ( points ) {
 
 		this.makeEmpty();
@@ -189,6 +193,10 @@ Object.assign( Box3.prototype, {
 
 	},
 
+	/**
+	 * 
+	 * @param {Vector3} target 
+	 */
 	getCenter: function ( target ) {
 
 		if ( target === undefined ) {
@@ -279,6 +287,10 @@ Object.assign( Box3.prototype, {
 
 	},
 
+	/**
+	 * 判断三维坐标是否在是否在当前盒子内
+	 * @param {Vector3} point 
+	 */
 	containsPoint: function ( point ) {
 
 		return point.x < this.min.x || point.x > this.max.x ||
@@ -287,6 +299,10 @@ Object.assign( Box3.prototype, {
 
 	},
 
+	/**
+	 * 判断当前四边形盒子是否包含参数盒子
+	 * @param {Box3} box 
+	 */
 	containsBox: function ( box ) {
 
 		return this.min.x <= box.min.x && box.max.x <= this.max.x &&
@@ -295,6 +311,12 @@ Object.assign( Box3.prototype, {
 
 	},
 
+	/**
+	 * 用来获得参数point(一个Vector3的三维点坐标)在当前立方体边界的长高宽比
+	 * @param {Vector3} point 一个Vector3的三维点坐标点
+	 * @param {Vector3} target 可选参数,接收返回结果,含长高宽比的三维向量
+	 * @returns {Vector3} 返回包含高宽比的三维向量
+	 */
 	getParameter: function ( point, target ) {
 
 		// This can potentially have a divide by zero if the box
@@ -324,6 +346,10 @@ Object.assign( Box3.prototype, {
 
 	},
 
+	/**
+	 * 
+	 * @param {Sphere} sphere 
+	 */
 	intersectsSphere: function ( sphere ) {
 
 		// Find the point on the AABB closest to the sphere center.
@@ -381,6 +407,10 @@ Object.assign( Box3.prototype, {
 
 	},
 
+	/**
+	 * 判断三角形立方体是否相交
+	 * @param {Triangle} triangle 
+	 */
 	intersectsTriangle: function ( triangle ) {
 
 		if ( this.isEmpty() ) {
@@ -434,6 +464,11 @@ Object.assign( Box3.prototype, {
 
 	},
 
+	/**
+	 * 用来限制参数point在立方体边界内.如果point小于min,返回min,如果大于max返回max,否则返回point
+	 * @param {Vector3} point 
+	 * @param {Vector3} target 
+	 */
 	clampPoint: function ( point, target ) {
 
 		if ( target === undefined ) {
@@ -447,6 +482,10 @@ Object.assign( Box3.prototype, {
 
 	},
 
+	/**
+	 * 用来获得边界内一点到最小边界,最大边界的长度(box的12条边的长度)
+	 * @param {Vector3} point 
+	 */
 	distanceToPoint: function ( point ) {
 
 		var clampedPoint = _vector.copy( point ).clamp( this.min, this.max );
@@ -455,6 +494,10 @@ Object.assign( Box3.prototype, {
 
 	},
 
+	/**
+	 * 返回当前立方体边界的球形边界(这里应该内切于立方体边界的一个球体)
+	 * @param {Sphere} target 
+	 */
 	getBoundingSphere: function ( target ) {
 
 		if ( target === undefined ) {
@@ -472,6 +515,11 @@ Object.assign( Box3.prototype, {
 
 	},
 
+	/**
+	 * 用来通过收缩当前立方体边界,求当前立方体边界和参数box的交集.
+	 * @param {Box3} box 
+	 * @returns {Box3} 返回当前立方体边界和参数box的交集
+	 */
 	intersect: function ( box ) {
 
 		this.min.max( box.min );
@@ -484,6 +532,10 @@ Object.assign( Box3.prototype, {
 
 	},
 
+	/**
+	 * 用来通过扩展当前立方体边界,将参数box包围进当前的立方体边界内.就是取两个边界的并集
+	 * @param {Box3} box 
+	 */
 	union: function ( box ) {
 
 		this.min.min( box.min );
@@ -493,6 +545,10 @@ Object.assign( Box3.prototype, {
 
 	},
 
+	/**
+	 * 
+	 * @param {Matrix4} matrix 
+	 */
 	applyMatrix4: function ( matrix ) {
 
 		// transform of empty box is an empty box.

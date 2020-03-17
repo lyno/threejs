@@ -34,6 +34,9 @@ Object.assign( Matrix3.prototype, {
 		te[ 0 ] = n11; te[ 1 ] = n21; te[ 2 ] = n31;
 		te[ 3 ] = n12; te[ 4 ] = n22; te[ 5 ] = n32;
 		te[ 6 ] = n13; te[ 7 ] = n23; te[ 8 ] = n33;
+		// cosx ,-sinx, translatex
+		// sinx , cosx, translatey
+		// 0   ,     0,  scale
 		// te[ 0 ] = n11;te[ 3 ] = n12;te[ 6 ] = n13;
 		// te[ 1 ] = n21;te[ 4 ] = n22;te[ 7 ] = n23;
 		// te[ 2 ] = n31;te[ 5 ] = n32;te[ 8 ] = n33;
@@ -74,6 +77,10 @@ Object.assign( Matrix3.prototype, {
 
 	},
 
+	/**
+	 * 从参数四维矩阵中设置三维矩阵（前三行前三列）
+	 * @param {Matrix4} m 
+	 */
 	setFromMatrix4: function ( m ) {
 
 		var me = m.elements;
@@ -90,12 +97,20 @@ Object.assign( Matrix3.prototype, {
 
 	},
 
+	/**
+	 * 右乘m
+	 * @param {Matrix3} m 
+	 */
 	multiply: function ( m ) {
 
 		return this.multiplyMatrices( this, m );
 
 	},
 
+	/**
+	 * 左乘m
+	 * @param {Matrix3} m 
+	 */
 	premultiply: function ( m ) {
 
 		return this.multiplyMatrices( m, this );
@@ -144,6 +159,9 @@ Object.assign( Matrix3.prototype, {
 
 	},
 
+	/**
+	 * 求行列式
+	 */
 	determinant: function () {
 
 		var te = this.elements;
@@ -156,6 +174,12 @@ Object.assign( Matrix3.prototype, {
 
 	},
 
+	/**
+	 * 获得Matrix3(3x3矩阵)的逆矩阵 若AB=E，则AB互逆。
+	 * A^-1 = (1/|A| )A* 其中A*是A的伴随矩阵
+	 * @param {Matrix} matrix 
+	 * @param {boolean} throwOnDegenerate 
+	 */
 	getInverse: function ( matrix, throwOnDegenerate ) {
 
 		if ( matrix && matrix.isMatrix4 ) {
@@ -179,6 +203,7 @@ Object.assign( Matrix3.prototype, {
 
 		if ( det === 0 ) {
 
+			// 行列式为0
 			var msg = "THREE.Matrix3: .getInverse() can't invert matrix, determinant is 0";
 
 			if ( throwOnDegenerate === true ) {
@@ -213,6 +238,9 @@ Object.assign( Matrix3.prototype, {
 
 	},
 
+	/**
+	 * 返回Matrix3(3x3矩阵)的转置矩阵
+	 */
 	transpose: function () {
 
 		var tmp, m = this.elements;
@@ -225,12 +253,21 @@ Object.assign( Matrix3.prototype, {
 
 	},
 
+	/**
+	 * 用来获得Matrix4(4x4矩阵)的正规矩阵
+	 * 当前矩阵的逆矩阵的转置矩阵就是当前矩阵的正规矩阵
+	 * @param {Matrix4} matrix4 
+	 */
 	getNormalMatrix: function ( matrix4 ) {
 
 		return this.setFromMatrix4( matrix4 ).getInverse( this ).transpose();
 
 	},
 
+	/**
+	 * 将此矩阵转置为提供的数组r，然后返回自身。
+	 * @param {number[]} r 
+	 */
 	transposeIntoArray: function ( r ) {
 
 		var m = this.elements;
@@ -249,6 +286,16 @@ Object.assign( Matrix3.prototype, {
 
 	},
 
+	/**
+	 * 修改掉纹理UV映射的方式
+	 * @param {number} tx 
+	 * @param {number} ty 
+	 * @param {number} sx 
+	 * @param {number} sy 
+	 * @param {number} rotation in radians
+	 * @param {number} cx 
+	 * @param {number} cy 
+	 */
 	setUvTransform: function ( tx, ty, sx, sy, rotation, cx, cy ) {
 
 		var c = Math.cos( rotation );

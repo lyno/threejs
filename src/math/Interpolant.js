@@ -19,7 +19,13 @@
  *
  * @author tschw
  */
-
+/**
+ * 参数样本上插值的抽象基类
+ * @param {*} parameterPositions 
+ * @param {*} sampleValues 
+ * @param {*} sampleSize 
+ * @param {*} resultBuffer 
+ */
 function Interpolant( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
 
 	this.parameterPositions = parameterPositions;

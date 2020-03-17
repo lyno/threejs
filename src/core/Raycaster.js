@@ -5,9 +5,17 @@ import { Ray } from '../math/Ray.js';
  * @author bhouston / http://clara.io/
  * @author stephomi / http://stephaneginier.com/
  */
-
+/**
+ * 射线拾取对象, (比Math/Ray 类多了near,far两个参数 )
+ *
+ * @param {*} origin 射线起点
+ * @param {*} direction 射线方向
+ * @param {*} near 最近距离
+ * @param {*} far 最远距离
+ */
 function Raycaster( origin, direction, near, far ) {
 
+	// 射线
 	this.ray = new Ray( origin, direction );
 	// direction is assumed to be normalized (for accurate distance calculations)
 
@@ -15,6 +23,7 @@ function Raycaster( origin, direction, near, far ) {
 	this.far = far || Infinity;
 	this.camera = null;
 
+	// 拾取结果
 	this.params = {
 		Mesh: {},
 		Line: {},
@@ -35,13 +44,27 @@ function Raycaster( origin, direction, near, far ) {
 	} );
 
 }
-
+/**
+ * 距离升序排序方法
+ * 距离从小到大排列， 近的排在前，远的排在后。
+ * @param {Intersection} a
+ * @param {Intersection} b
+ * @returns
+ */
 function ascSort( a, b ) {
 
 	return a.distance - b.distance;
 
 }
-
+/**
+ * 相交对象, 判断物体object是否与射线相交，若相交则添加至intersects数组
+ *
+ * @param {Object3D} object 
+ * @param {Raycaster} raycaster
+ * @param {Intersection[]} intersects 拾取结果对象数组，结果添加至数组
+ * @param {boolean} recursive 是否递归判断子对象
+ * @returns
+ */
 function intersectObject( object, raycaster, intersects, recursive ) {
 
 	if ( object.visible === false ) return;
@@ -74,6 +97,11 @@ Object.assign( Raycaster.prototype, {
 
 	},
 
+	/**
+	 * 
+	 * @param {*} coords 
+	 * @param {*} camera 
+	 */
 	setFromCamera: function ( coords, camera ) {
 
 		if ( ( camera && camera.isPerspectiveCamera ) ) {
@@ -96,6 +124,13 @@ Object.assign( Raycaster.prototype, {
 
 	},
 
+	/**
+	 * 拾取相交判断
+	 * @param {Object3D} object 
+	 * @param {boolean} recursive 
+	 * @param {Intersection[]} optionalTarget 
+	 * @returns {Intersection[]}
+	 */
 	intersectObject: function ( object, recursive, optionalTarget ) {
 
 		var intersects = optionalTarget || [];
@@ -108,6 +143,13 @@ Object.assign( Raycaster.prototype, {
 
 	},
 
+	/**
+	 * 拾取相交判断
+	 * @param {Object3D[]} objects 
+	 * @param {boolean} recursive 
+	 * @param {Intersection[]} optionalTarget 
+	 * @returns {Intersection[]}
+	 */
 	intersectObjects: function ( objects, recursive, optionalTarget ) {
 
 		var intersects = optionalTarget || [];
