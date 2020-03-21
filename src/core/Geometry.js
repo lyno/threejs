@@ -23,7 +23,10 @@ var _geometryId = 0; // Geometry uses even numbers as Id
 var _m1 = new Matrix4();
 var _obj = new Object3D();
 var _offset = new Vector3();
-
+/**
+ * 几何体对象基类
+ * Geometry是场景中由顶点和三角面构成的几何体对象的基类,保存描述几何体所有必要的数据
+ */
 function Geometry() {
 
 	Object.defineProperty( this, 'id', { value: _geometryId += 2 } );
@@ -33,30 +36,48 @@ function Geometry() {
 	this.name = '';
 	this.type = 'Geometry';
 
+	/** {Vector3[]} 几何体顶点列表*/
 	this.vertices = [];
+	/** {Vector3[]}  何体顶点颜色列表，和索引一对一 */
 	this.colors = [];
+	/**几何体三角面数组 */
 	this.faces = [];
+	/** {Vector2[][]} 几何体UV数组 按照三角面的索引顺序,将三角面的顶点按照顶点在三角面中的索引顺序存放在数组中,这里是一个二维数组 */
 	this.faceVertexUvs = [[]];
 
+	/**变形顶点数组,每个变形顶点都是一个javascript对象 */
 	this.morphTargets = [];
+	/**变形法线向量数组也有和变形顶点数组类似的结构,每个法向量是javascript对象 */
 	this.morphNormals = [];
 
+	/**蒙皮权重数组,和顶点数组的数量和顺序保持一致 */
 	this.skinWeights = [];
+	/**蒙皮指数数组,和顶点数组的数量和顺序保持一致 */
 	this.skinIndices = [];
 
+	/**这个数组包含将顶点按照索引顺序依次连线产生的几何线段的长度 */
 	this.lineDistances = [];
 
+	/**立方体界限,根据当前几何体生成的立方体界限 */
 	this.boundingBox = null;
+	/**球体界限,根据当前几何体生成的球体界限 */
 	this.boundingSphere = null;
 
 	// update flags
 
+	/**如果已经更新this.faces属性,需要将 Geometry.elementsNeedUpdate设置为true. */
 	this.elementsNeedUpdate = false;
+	/**如果已经更新this.vertices属性,需要将 Geometry.verticesNeedUpdat设置为true. */
 	this.verticesNeedUpdate = false;
+	/**如果已经更新this.faceVertexUvs属性,需要将 Geometry.uvsNeedUpdate设置为true */
 	this.uvsNeedUpdate = false;
+	/**如果三角面对象的法线向量数组已经更新,需要将Geometry.normalsNeedUpdate属性设置为true */
 	this.normalsNeedUpdate = false;
+	/**如果已经要更新this.colors属性,需要将Geometry.colorsNeedUpdate设置为true */
 	this.colorsNeedUpdate = false;
+	/**如果已经要更新this.lineDistances属性,需要将Geometry.lineDistancesNeedUpdate设置为true */
 	this.lineDistancesNeedUpdate = false;
+	/**如果想组中添加删除对象,设置为true */
 	this.groupsNeedUpdate = false;
 
 }
@@ -67,22 +88,35 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	isGeometry: true,
 
+	/**
+	 * 对对象的vertices属性应用矩阵变换.达到旋转,缩放,移动的目的
+	 * 3D物体的形变(位移，旋转，缩放)涉及到两个方面，一是顶点位置的变化，二是法向量的变化。顶点位置变化才能实现形变的各种效果，法向量变化实现更新物体的光照反射的效果。在Geometry.js中，物体形变通过applyMatrix实现
+	 * 更新geometry中的所有顶点坐标和表面的法线向量，所做的实际上是用变换矩阵matrix对geometry形体进行空间变换
+	 * @param {Matrix4} matrix 
+	 */
 	applyMatrix: function ( matrix ) {
 
+		// normalMatrix是参数matrix左上角3×3矩阵的正规矩阵（当前矩阵的逆矩阵的转置矩阵），该矩阵用来旋转矢量（面法线和顶点法线，而不是顶点坐标）
+		// 问题：为什么要用normalMatrix对法线作变换，而不是直接用matrix???
+		// 用法向量乘以形变矩阵的逆转置矩阵，就可以得到形变后的法向量
 		var normalMatrix = new Matrix3().getNormalMatrix( matrix );
 
+		// 遍历vertices数组，对每个顶点做矩阵变换
 		for ( var i = 0, il = this.vertices.length; i < il; i ++ ) {
 
 			var vertex = this.vertices[ i ];
 			vertex.applyMatrix4( matrix );
 
 		}
-
+		// https://zhuanlan.zhihu.com/p/29474729
+		// 更新法向量 
+		// 遍历faces数组，对每个face的法线(normal)和顶点法线(vertexNormal)中的每个顶点应用变换
 		for ( var i = 0, il = this.faces.length; i < il; i ++ ) {
 
 			var face = this.faces[ i ];
+			// 遍历物体每个面的法向量，得到形变后的法向量
 			face.normal.applyMatrix3( normalMatrix ).normalize();
-
+			// 遍历物体每个面的顶点法向量，得到形变后的顶点法向量
 			for ( var j = 0, jl = face.vertexNormals.length; j < jl; j ++ ) {
 
 				face.vertexNormals[ j ].applyMatrix3( normalMatrix ).normalize();
@@ -91,12 +125,14 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		}
 
+		// 更新(重新计算)计算当前Geometry对象的立方体界限
 		if ( this.boundingBox !== null ) {
 
 			this.computeBoundingBox();
 
 		}
 
+		// 更新(重新计算)计算当前Geometry对象的球体界限
 		if ( this.boundingSphere !== null ) {
 
 			this.computeBoundingSphere();
@@ -158,6 +194,13 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	},
 
+	/**
+	 * 对几何体进行缩放
+	 * 方法是：构建一个在三个坐标轴方向绽放分别是，x,y,z的的缩放矩阵，并应用该矩阵
+	 * @param {number} x 
+	 * @param {number} y 
+	 * @param {number} z 
+	 */
 	scale: function ( x, y, z ) {
 
 		// scale geometry
@@ -170,6 +213,10 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	},
 
+	/**
+	 * 
+	 * @param {Vector3} vector 
+	 */
 	lookAt: function ( vector ) {
 
 		_obj.lookAt( vector );
@@ -182,11 +229,17 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	},
 
+	/**
+	 * 从Buffer构造Geometry对象
+	 * @param {Geometry} geometry 
+	 */
 	fromBufferGeometry: function ( geometry ) {
 
 		var scope = this;
 
+		// 索引数组
 		var indices = geometry.index !== null ? geometry.index.array : undefined;
+		// Geometry属性
 		var attributes = geometry.attributes;
 
 		if ( attributes.position === undefined ) {
@@ -196,9 +249,13 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		}
 
+		// 顶点数组
 		var positions = attributes.position.array;
+		// 法线数组
 		var normals = attributes.normal !== undefined ? attributes.normal.array : undefined;
+		// 顶点颜色数组
 		var colors = attributes.color !== undefined ? attributes.color.array : undefined;
+		// uv数组
 		var uvs = attributes.uv !== undefined ? attributes.uv.array : undefined;
 		var uvs2 = attributes.uv2 !== undefined ? attributes.uv2.array : undefined;
 
@@ -206,10 +263,11 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		for ( var i = 0; i < positions.length; i += 3 ) {
 
+			// 添加顶点
 			scope.vertices.push( new Vector3().fromArray( positions, i ) );
 
 			if ( colors !== undefined ) {
-
+				// 添加颜色
 				scope.colors.push( new Color().fromArray( colors, i ) );
 
 			}
@@ -322,6 +380,9 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	},
 
+	/**
+	 * 计算出当前Geometry对象的立方体界限的中心
+	 */
 	center: function () {
 
 		this.computeBoundingBox();
@@ -357,6 +418,10 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	},
 
+	/**
+	 * 重新计算三角面对象的法线向量
+	 * 计算法线向量，影响的是face数组中每个元素的normal属性，一个face只有1个
+	 */
 	computeFaceNormals: function () {
 
 		var cb = new Vector3(), ab = new Vector3();
@@ -381,8 +446,20 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	},
 
+	/**
+	 * 重新计算三角面对象顶点的法线向量
+	 * face数组中每个元素的vertexNormal属性，一个face3型对象有3个<br />
+	 * 但是需要注意的是，被多个表面共享的顶点，其法线向量只有一个，同时受到多个表面的影响。比如中心在原点，三组表面都垂直于轴的立方体<br />
+	 * 其第一象限中的顶点，法线向量是(1,1,1)的归一化。虽然看上去不可思议，平面的顶点的法线居然不是垂直于平面的，但这种指定法线的方法<br />
+	 * 在利用平面模拟曲面的时候有很好的效果<br />
+	 * 顶点法线（Vertex Normal）是过顶点的一个矢量，用于在高洛德着色（Gouraud Shading）中的计算光照和纹理效果。在生成曲面时<br />
+	 * 通常令顶点法线和相邻平面的法线保持等角，如图1，这样进行渲染时，会在平面接缝处产生一种平滑过渡的效果。如果是多边形<br />
+	 * 则令顶点法线等于该点所属平面（三角形）的法线，以便在接缝处产生突出的边缘
+	 * @param {boolean} areaWeighted true表示face数组中的发线没有被计算,false或者忽略表示已经计算过了
+	 */
 	computeVertexNormals: function ( areaWeighted ) {
 
+		// 一个三角面只会有一个法向量。一个顶点会属于不同的三角面，因此一个顶点会有多个法向量
 		if ( areaWeighted === undefined ) areaWeighted = true;
 
 		var v, vl, f, fl, face, vertices;
@@ -509,6 +586,9 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	},
 
+	/**
+	 * 重新计算三角面对象变形顶点的法线向量,morph应该是用作显示固定连续动画的变形效果
+	 */
 	computeMorphNormals: function () {
 
 		var i, il, f, fl, face;
@@ -626,6 +706,9 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	},
 
+	/**
+	 * 重新计算当前几何体对象的立方体界限,并更新this.boundingBox[]属性
+	 */
 	computeBoundingBox: function () {
 
 		if ( this.boundingBox === null ) {
@@ -638,6 +721,9 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	},
 
+	/**
+	 * 重新计算当前几何体对象的球体界限,并更新this.boundingSphere[]属性
+	 */
 	computeBoundingSphere: function () {
 
 		if ( this.boundingSphere === null ) {
@@ -650,6 +736,12 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	},
 
+	/**
+	 * 将两个几何体对象或者Object3D里面的几何体对象合并,(使用对象的变换)将几何体的顶点,面,UV分别合并.
+	 * @param {Geometry} geometry 要被合并的几何体
+	 * @param {Matrix4} matrix 可选参数,变换矩阵,当指定了该参数,合并后的对象会应用变换
+	 * @param {number} materialIndexOffset 材质索引偏移量
+	 */
 	merge: function ( geometry, matrix, materialIndexOffset ) {
 
 		if ( ! ( geometry && geometry.isGeometry ) ) {
@@ -785,18 +877,21 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	},
 
-	/*
-	 * Checks for duplicate vertices with hashmap.
-	 * Duplicated vertices are removed
-	 * and faces' vertices are updated.
+	/**
+	 * 清理几何体中重复的顶点
+	 * Checks for duplicate vertices with hashmap.用HashMap检查重复的顶点
+	 * Duplicated vertices are removed删除重复的顶点
+	 * and faces' vertices are updated.并且更新面的顶点
+	 * @returns {number} 相差的点数目
 	 */
-
 	mergeVertices: function () {
 
+		// 定义HashMap查找顶点的位置坐标,确保顶点的位置坐标是唯一的.
 		var verticesMap = {}; // Hashmap for looking up vertices by position coordinates (and making sure they are unique)
 		var unique = [], changes = [];
 
 		var v, key;
+		// 数字的小数点长度,比如值为4,相应的小数为0.0001
 		var precisionPoints = 4; // number of decimal points, e.g. 4 for epsilon of 0.0001
 		var precision = Math.pow( 10, precisionPoints );
 		var i, il, face;
@@ -874,6 +969,10 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	},
 
+	/**
+	 * 从二维或三维向量数组生成几何体
+	 * @param {Vector2[]|Vector3[]} points 
+	 */
 	setFromPoints: function ( points ) {
 
 		this.vertices = [];
@@ -889,6 +988,9 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	},
 
+	/**
+	 * 按照材质索引对面（face & faceVertexUvs）重新排序
+	 */
 	sortFacesByMaterialIndex: function () {
 
 		var faces = this.faces;
@@ -902,7 +1004,7 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		}
 
-		// sort faces
+		// sort faces 降序
 
 		function materialIndexSort( a, b ) {
 

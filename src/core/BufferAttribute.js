@@ -9,7 +9,15 @@ import { StaticDrawUsage } from '../constants.js';
  */
 
 var _vector = new Vector3();
-
+/**
+ * 属性对象类
+ * 存储于bufferGeometry相关联的属性数据
+ * @param {ArrayLike<number>} array 
+ * interface ArrayLike<T> {length: number; [n: number]: T;}
+ * TypedArray Int8Array Int16Array
+ * @param {number} itemSize
+ * @param {boolean} normalized
+ */
 function BufferAttribute( array, itemSize, normalized ) {
 
 	if ( Array.isArray( array ) ) {
@@ -21,6 +29,7 @@ function BufferAttribute( array, itemSize, normalized ) {
 	this.name = '';
 
 	this.array = array;
+	// 数组元素尺寸
 	this.itemSize = itemSize;
 	this.count = array !== undefined ? array.length / itemSize : 0;
 	this.normalized = normalized === true;
@@ -70,6 +79,12 @@ Object.assign( BufferAttribute.prototype, {
 
 	},
 
+	/**
+	 * 
+	 * @param {number} index1 
+	 * @param {BufferAttribute} attribute 
+	 * @param {number} index2 
+	 */
 	copyAt: function ( index1, attribute, index2 ) {
 
 		index1 *= this.itemSize;

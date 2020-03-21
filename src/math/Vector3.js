@@ -273,7 +273,10 @@ Object.assign( Vector3.prototype, {
 
 	/**
 	 * 方法提供了将参数m(变换矩阵)左乘当前向量，并将结果赋值给当前向量，实现变换。
-	 * 矩阵中最下面一行为缩放因子;
+	 * 变换矩阵中最后面一列为平移因子;
+	 * 变换矩阵中最下面一行为缩放因子（整体）;
+	 * 变换矩阵中主对角线为缩放因子（分别对xyz）;
+	 * 
 	 * @param {Matrix4} m 变换矩阵
 	 * @returns {this} 当前Vector3向量
 	 */
@@ -333,6 +336,10 @@ Object.assign( Vector3.prototype, {
 
 	},
 
+	/**
+	 * 
+	 * @param {Matrix4} m 
+	 */
 	transformDirection: function ( m ) {
 
 		// input: THREE.Matrix4 affine matrix

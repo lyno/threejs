@@ -394,6 +394,12 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	},
 
+	/**
+	 * 
+	 * @param {number} x 
+	 * @param {number} y 
+	 * @param {number} z 
+	 */
 	lookAt: function ( x, y, z ) {
 
 		// This method does not support objects having non-uniformly-scaled parent(s)
@@ -410,8 +416,10 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		var parent = this.parent;
 
+		// 更新世界矩阵，并对父对象的世界矩阵的更新
 		this.updateWorldMatrix( true, false );
 
+		// 从世界矩阵中获取坐标
 		_position.setFromMatrixPosition( this.matrixWorld );
 
 		if ( this.isCamera || this.isLight ) {

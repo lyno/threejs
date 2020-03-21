@@ -7,15 +7,19 @@
 import { Matrix4 } from '../math/Matrix4.js';
 import { Object3D } from '../core/Object3D.js';
 import { Vector3 } from '../math/Vector3.js';
-
+/**
+ * 相机基类
+ */
 function Camera() {
 
 	Object3D.call( this );
 
 	this.type = 'Camera';
 
+	/* 这是matrixWorld的逆矩阵,matrixWorld包含相机在世界坐标系的变换矩阵 */
 	this.matrixWorldInverse = new Matrix4();
 
+	/*相机设置属性projectionMatrix,包含相机的投影矩阵 */
 	this.projectionMatrix = new Matrix4();
 	this.projectionMatrixInverse = new Matrix4();
 
@@ -40,6 +44,10 @@ Camera.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	},
 
+	/**
+	 * 获取世界坐标系内的四元数参数
+	 * @param {Vector3} target 
+	 */
 	getWorldDirection: function ( target ) {
 
 		if ( target === undefined ) {

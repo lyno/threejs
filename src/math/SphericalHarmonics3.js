@@ -12,7 +12,9 @@ import { Vector3 } from './Vector3.js';
  */
 
 // 3-band SH defined by 9 coefficients
-
+/**
+ * 球形谐波3 由9个系数定义的3波段SH
+ */
 function SphericalHarmonics3() {
 
 	this.coefficients = [];

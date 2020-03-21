@@ -34,9 +34,11 @@ function Face3( a, b, c, normal, color, materialIndex ) {
 	this.c = c;
 
 	this.normal = ( normal && normal.isVector3 ) ? normal : new Vector3();
+	// 一个三角面只会有一个法向量。一个顶点会属于不同的三角面，因此一个顶点会有多个法向量
 	this.vertexNormals = Array.isArray( normal ) ? normal : [];
 
 	this.color = ( color && color.isColor ) ? color : new Color();
+	// 一个三角面可能包含上百个像素。vertexColors指定了三角面顶点的颜色，GPU通过插值的方式算出其他像素的颜色，最终实现整个三角面着色
 	this.vertexColors = Array.isArray( color ) ? color : [];
 
 	this.materialIndex = materialIndex !== undefined ? materialIndex : 0;

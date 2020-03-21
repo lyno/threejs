@@ -9,7 +9,14 @@ import { MathUtils } from './MathUtils.js';
  * The polar angle (phi) is measured from the positive y-axis. The positive y-axis is up.
  * The azimuthal angle (theta) is measured from the positive z-axis.
  */
-
+/**
+ * 一个点的球坐标
+ * 极角（phi）是从y轴的正方向测量的。 y轴正上方。
+ * 方位角（θ）是从z轴正方向测量的。
+ * @param {number} radius 
+ * @param {number} phi 
+ * @param {number} theta 
+ */
 function Spherical( radius, phi, theta ) {
 
 	this.radius = ( radius !== undefined ) ? radius : 1.0;
@@ -48,7 +55,7 @@ Object.assign( Spherical.prototype, {
 
 	},
 
-	// restrict phi to be betwee EPS and PI-EPS
+	// restrict phi to be betwee EPS and PI-EPS 将phi限制在EPS和PI-EPS之间
 	makeSafe: function () {
 
 		var EPS = 0.000001;
@@ -64,6 +71,12 @@ Object.assign( Spherical.prototype, {
 
 	},
 
+	/**
+	 * 从笛卡尔坐标设置
+	 * @param {*} x 
+	 * @param {*} y 
+	 * @param {*} z 
+	 */
 	setFromCartesianCoords: function ( x, y, z ) {
 
 		this.radius = Math.sqrt( x * x + y * y + z * z );

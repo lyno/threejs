@@ -35,7 +35,9 @@ class BoxGeometry extends Geometry {
 }
 
 // BoxBufferGeometry
-
+/**
+ * BufferGeometry中封装了所有的对外的接口，BoxBufferGeometry类只是填充BufferGeometry中的数据
+ */
 class BoxBufferGeometry extends BufferGeometry {
 
 	constructor( width, height, depth, widthSegments, heightSegments, depthSegments ) {
@@ -45,28 +47,30 @@ class BoxBufferGeometry extends BufferGeometry {
 		this.type = 'BoxBufferGeometry';
 
 		this.parameters = {
-			width: width,
-			height: height,
-			depth: depth,
-			widthSegments: widthSegments,
-			heightSegments: heightSegments,
-			depthSegments: depthSegments
+			width: width,//宽
+			height: height,//高
+			depth: depth,// 深度
+			widthSegments: widthSegments,// 宽的分段
+			heightSegments: heightSegments,// 高的分段
+			depthSegments: depthSegments// 深度分段
 		};
 
 		var scope = this;
 
+		 //默认的宽、高、深度都是1
 		width = width || 1;
 		height = height || 1;
 		depth = depth || 1;
 
 		// segments
 
+		//默认的宽、高、深度分段都是1
 		widthSegments = Math.floor( widthSegments ) || 1;
 		heightSegments = Math.floor( heightSegments ) || 1;
 		depthSegments = Math.floor( depthSegments ) || 1;
 
 		// buffers
-
+		//索引、顶点、法线、uv的数组
 		var indices = [];
 		var vertices = [];
 		var normals = [];
@@ -74,11 +78,20 @@ class BoxBufferGeometry extends BufferGeometry {
 
 		// helper variables
 
+		//顶点总的数量
 		var numberOfVertices = 0;
+		//绘制批次的开始
 		var groupStart = 0;
 
-		// build each side of the box geometry
-
+		// build each side of the box geometry建立盒子几何的每一面
+		// 创建盒子几何体每个面的顶点属性（索引、顶点、法线、uv）
+		// px nx py ny pz nz 分别表示六个面，从立方体模型的中心点的参考点则：
+		// px Right
+		// nx Left
+		// py Up
+		// ny Down
+		// pz Back
+		// nz Front
 		buildPlane( 'z', 'y', 'x', - 1, - 1, depth, height, width, depthSegments, heightSegments, 0 ); // px
 		buildPlane( 'z', 'y', 'x', 1, - 1, depth, height, - width, depthSegments, heightSegments, 1 ); // nx
 		buildPlane( 'x', 'z', 'y', 1, 1, width, depth, height, widthSegments, depthSegments, 2 ); // py
@@ -87,12 +100,28 @@ class BoxBufferGeometry extends BufferGeometry {
 		buildPlane( 'x', 'y', 'z', - 1, - 1, width, height, - depth, widthSegments, heightSegments, 5 ); // nz
 
 		// build geometry
-
+		// 填充父类（BufferGeometry）中的数据
 		this.setIndex( indices );
+		// 每个面是四个顶点，六个面就是24个顶点
 		this.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+		// 顶点法线
 		this.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 		this.setAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
 
+		/**
+		 * 构造一个由指定segments所构成的矩形面，并设置 vertices、normals、uv 属性
+		 * @param {string} u 
+		 * @param {string} v 
+		 * @param {string} w 
+		 * @param {number} udir 
+		 * @param {number} vdir 
+		 * @param {number} width 面的宽
+		 * @param {number} height 面的高
+		 * @param {number} depth 面的深度
+		 * @param {number} gridX 宽分段数
+		 * @param {number} gridY 高的分段数
+		 * @param {number} materialIndex 材质索引
+		 */
 		function buildPlane( u, v, w, udir, vdir, width, height, depth, gridX, gridY, materialIndex ) {
 
 			var segmentWidth = width / gridX;
@@ -102,7 +131,9 @@ class BoxBufferGeometry extends BufferGeometry {
 			var heightHalf = height / 2;
 			var depthHalf = depth / 2;
 
+			// 宽分段数加1， 即为宽度的顶点数
 			var gridX1 = gridX + 1;
+			// 高分段数加1， 即为高方向的顶点数
 			var gridY1 = gridY + 1;
 
 			var vertexCounter = 0;

@@ -393,9 +393,9 @@ Object.assign( Matrix4.prototype, {
 
 	/**
 	 * lookAt(eye,center,up)将对象设定为一个视图矩阵。參数都是Vector3对象，该矩阵仅仅会用到eye和center的相对位置。
-	 * @param {*} eye 表示相机位置的Vector3三维向量
-	 * @param {*} target 表示目标的Vector3三维向量
-	 * @param {*} up 表示向上的Vector3三维向量
+	 * @param {Vector3} eye 表示相机位置的Vector3三维向量
+	 * @param {Vector3} target 表示目标的Vector3三维向量
+	 * @param {Vector3} up 表示向上的Vector3三维向量
 	 * @returns {this} 返回当前Matrix4(4x4矩阵)
 	 */
 	lookAt: function ( eye, target, up ) {
@@ -791,7 +791,7 @@ Object.assign( Matrix4.prototype, {
 	},
 
 	/**
-	 * makeRotationX方法生成绕y轴转theta弧度的旋转矩阵
+	 * makeRotationY方法生成绕y轴转theta弧度的旋转矩阵
 	 * 用法：左乘目标向量，实现向量旋转
 	 * @param {number} theta 旋转弧度
 	 * @returns {this} 返回当前Matrix4(4x4矩阵)
@@ -814,7 +814,7 @@ Object.assign( Matrix4.prototype, {
 	},
 
 	/**
-	 * makeRotationX方法生成绕z轴转theta弧度的旋转矩阵
+	 * makeRotationZ方法生成绕z轴转theta弧度的旋转矩阵
 	 * 用法：左乘目标向量，实现向量旋转
 	 * @param {number} theta 旋转弧度
 	 * @returns {this} 返回当前Matrix4(4x4矩阵)
@@ -946,7 +946,7 @@ Object.assign( Matrix4.prototype, {
 		te[ 10 ] = ( 1 - ( xx + yy ) ) * sz;
 		te[ 11 ] = 0;
 
-		// 最后一列
+		// 最后一列 平移因子
 		te[ 12 ] = position.x;
 		te[ 13 ] = position.y;
 		te[ 14 ] = position.z;
@@ -1048,7 +1048,7 @@ Object.assign( Matrix4.prototype, {
 	},
 
 	/**
-	 * makePerspective方法依据left, right, bottom, top, near, far生成正交投影矩阵
+	 * makeOrthographic方法依据left, right, bottom, top, near, far生成正交投影矩阵
 	 * @param {number} left 指明相对于垂直平面的左侧坐标位置
 	 * @param {number} right 指明相对于垂直平面的右侧坐标位置
 	 * @param {number} top 指明相对于垂直平面的顶部坐标位置

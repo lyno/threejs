@@ -15,7 +15,7 @@ import { arrayMax } from '../utils.js';
  * @author mrdoob / http://mrdoob.com/
  */
 
-var _bufferGeometryId = 1; // BufferGeometry uses odd numbers as Id
+var _bufferGeometryId = 1; // BufferGeometry uses odd numbers as Id  BufferGeometry使用奇数作为ID
 
 var _m1 = new Matrix4();
 var _obj = new Object3D();
@@ -23,7 +23,12 @@ var _offset = new Vector3();
 var _box = new Box3();
 var _boxMorphTargets = new Box3();
 var _vector = new Vector3();
-
+/**
+ * 缓冲类型几何体 
+ * 将所有的数据包括顶点位置,法线,面,颜色,uv和其它的自定义属性存在缓冲区
+ * 比如顶点位置不是Vector3对象,颜色也不是color对象,而是数组.需要访问这些属性,需要从属性缓冲区中读原始数据
+ * 根据BufferGeometry类特性,我们在创建一些静态对象,实例化后不经常操作的对象时,选择这个类
+ */
 function BufferGeometry() {
 
 	Object.defineProperty( this, 'id', { value: _bufferGeometryId += 2 } );
@@ -82,6 +87,11 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 	},
 
+	/**
+	 * 根据属性名称给BufferGeometry添加属性信息
+	 * @param {string} name position normal uv tangent
+	 * @param {BufferAttribute} attribute 
+	 */
 	setAttribute: function ( name, attribute ) {
 
 		this.attributes[ name ] = attribute;
@@ -123,8 +133,14 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 	},
 
+	/**
+	 * 对BufferGeometry对象的vertices顶点应用矩阵变换.达到旋转,缩放,移动的目的
+	 * 包括位置，法线和切线
+	 * @param {Matix4} matrix 
+	 */
 	applyMatrix: function ( matrix ) {
 
+		/**Float32BufferAttribute */
 		var position = this.attributes.position;
 
 		if ( position !== undefined ) {
@@ -135,6 +151,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		}
 
+		/**Float32BufferAttribute */
 		var normal = this.attributes.normal;
 
 		if ( normal !== undefined ) {
@@ -147,6 +164,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		}
 
+		/**Float32BufferAttribute */
 		var tangent = this.attributes.tangent;
 
 		if ( tangent !== undefined ) {
@@ -449,6 +467,10 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 	},
 
+	/**
+	 * 将Geometry对象转换为BufferGeometry对象
+	 * @param {Geometry} geometry 
+	 */
 	fromGeometry: function ( geometry ) {
 
 		geometry.__directGeometry = new DirectGeometry().fromGeometry( geometry );
