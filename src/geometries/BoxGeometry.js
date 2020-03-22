@@ -102,10 +102,12 @@ class BoxBufferGeometry extends BufferGeometry {
 		// build geometry
 		// 填充父类（BufferGeometry）中的数据
 		this.setIndex( indices );
-		// 每个面是四个顶点，六个面就是24个顶点
+		// 每个面是四个顶点，六个面就是24个顶点，vertices的长度是顶点数乘3=24*3
 		this.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
-		// 顶点法线
+		// 顶点法线 ，此处法线与顶点是对应的，是每顶点的法线，所以normals的长度与vertices一样=24*3
+		// 按照上面buildPlane的调用顺序，依次4个[1,0,0],4个[-1,0,0],4个[0,1,0],4个[0,-1,0],4个[-1,0,0],4个[0,0,1],4个[0,0,-1]
 		this.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
+		// 每个顶点的uv坐标，长度为24*2=48，每个面[0, 1, 1, 1, 0, 0, 1, 0]，6个面重复6次
 		this.setAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
 
 		/**
@@ -161,6 +163,7 @@ class BoxBufferGeometry extends BufferGeometry {
 
 					// now apply vector to vertex buffer
 
+					// 顶点缓冲区
 					vertices.push( vector.x, vector.y, vector.z );
 
 					// set values to correct vector component
@@ -215,7 +218,7 @@ class BoxBufferGeometry extends BufferGeometry {
 			}
 
 			// add a group to the geometry. this will ensure multi material support
-
+			// 将一组添加到几何体。 这将确保多材质支持
 			scope.addGroup( groupStart, groupCount, materialIndex );
 
 			// calculate new start value for groups

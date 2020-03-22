@@ -395,7 +395,7 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 	},
 
 	/**
-	 * 
+	 * 设置物体朝向到参数指定的点
 	 * @param {number} x 
 	 * @param {number} y 
 	 * @param {number} z 
@@ -422,6 +422,7 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		// 从世界矩阵中获取坐标
 		_position.setFromMatrixPosition( this.matrixWorld );
 
+		// _m1 是旋转矩阵
 		if ( this.isCamera || this.isLight ) {
 
 			_m1.lookAt( _position, _target, this.up );
@@ -432,6 +433,7 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		}
 
+		// 根据旋转矩阵生成 四元数
 		this.quaternion.setFromRotationMatrix( _m1 );
 
 		if ( parent ) {
