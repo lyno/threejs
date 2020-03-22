@@ -214,7 +214,7 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 	},
 
 	/**
-	 * 
+	 * 设置几何体的朝向
 	 * @param {Vector3} vector 
 	 */
 	lookAt: function ( vector ) {
@@ -231,7 +231,7 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	/**
 	 * 从Buffer构造Geometry对象
-	 * @param {Geometry} geometry 
+	 * @param {BufferGeometry} geometry 
 	 */
 	fromBufferGeometry: function ( geometry ) {
 
@@ -249,13 +249,13 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		}
 
-		// 顶点数组
+		// 顶点数组 Array<number>
 		var positions = attributes.position.array;
-		// 法线数组
+		// 法线数组 Array<number>
 		var normals = attributes.normal !== undefined ? attributes.normal.array : undefined;
-		// 顶点颜色数组
+		// 顶点颜色数组 Array<number>
 		var colors = attributes.color !== undefined ? attributes.color.array : undefined;
-		// uv数组
+		// uv数组 Array<number>
 		var uvs = attributes.uv !== undefined ? attributes.uv.array : undefined;
 		var uvs2 = attributes.uv2 !== undefined ? attributes.uv2.array : undefined;
 
@@ -878,7 +878,7 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 	},
 
 	/**
-	 * 清理几何体中重复的顶点
+	 * 清理几何体中重复的顶点 （ fromBufferGeometry 时，会有些重复的点，用此方法去重）
 	 * Checks for duplicate vertices with hashmap.用HashMap检查重复的顶点
 	 * Duplicated vertices are removed删除重复的顶点
 	 * and faces' vertices are updated.并且更新面的顶点
@@ -893,7 +893,7 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		var v, key;
 		// 数字的小数点长度,比如值为4,相应的小数为0.0001
 		var precisionPoints = 4; // number of decimal points, e.g. 4 for epsilon of 0.0001
-		var precision = Math.pow( 10, precisionPoints );
+		var precision = Math.pow( 10, precisionPoints ); // 精度是10000，就是小数点后4位
 		var i, il, face;
 		var indices, j, jl;
 
@@ -904,8 +904,13 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 			if ( verticesMap[ key ] === undefined ) {
 
+				// verticesMap存放不重复的顶点在vertices中索引index（原索引值)
 				verticesMap[ key ] = i;
+				// unique存放不重复的顶点
 				unique.push( this.vertices[ i ] );
+				// changes 的value值为不重复的顶点在unique中索引（新索引值)
+				// changes 的key值为vertices的key值
+				// 也就是changes存放了顶点在vertices和unique中的对应关系
 				changes[ i ] = unique.length - 1;
 
 			} else {
@@ -919,13 +924,14 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 
 		// if faces are completely degenerate after merging vertices, we
-		// have to remove them from the geometry.
+		// have to remove them from the geometry.如果合并顶点后面完全退化，我们必须将其从几何图形中删除
 		var faceIndicesToRemove = [];
 
 		for ( i = 0, il = this.faces.length; i < il; i ++ ) {
 
 			face = this.faces[ i ];
 
+			// 修改顶点的索引值
 			face.a = changes[ face.a ];
 			face.b = changes[ face.b ];
 			face.c = changes[ face.c ];
@@ -934,6 +940,8 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 			// if any duplicate vertices are found in a Face3
 			// we have to remove the face as nothing can be saved
+			// 如果在Face3中存在顶点重复，必须删除该面，因为无法保存任何内容
+			// 1.判断面中是否顶点重复，将其索引添加到faceIndicesToRemove中
 			for ( var n = 0; n < 3; n ++ ) {
 
 				if ( indices[ n ] === indices[ ( n + 1 ) % 3 ] ) {
@@ -947,6 +955,7 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		}
 
+		// 2. 删除faceIndicesToRemove中的索引对应的面 及其对应的uv
 		for ( i = faceIndicesToRemove.length - 1; i >= 0; i -- ) {
 
 			var idx = faceIndicesToRemove[ i ];

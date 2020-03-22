@@ -44,11 +44,13 @@ function BufferGeometry() {
 	this.morphAttributes = {};
 	this.morphTargetsRelative = false;
 
+	// 将当前几何体分割成组进行渲染，每个部分都会在单独的 WebGL 的 draw call 中进行绘制。该方法可以让当前的 bufferGeometry 可以使用一个材质队列进行描述。
 	this.groups = [];
 
 	this.boundingBox = null;
 	this.boundingSphere = null;
 
+	// 用于判断几何体的哪个部分需要被渲染。该值不应该直接被设置，而需要通过 .setDrawRange 进行设置。
 	this.drawRange = { start: 0, count: Infinity };
 
 	this.userData = {};
@@ -230,7 +232,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 	translate: function ( x, y, z ) {
 
 		// translate geometry
-
+		// 生成平移矩阵
 		_m1.makeTranslation( x, y, z );
 
 		this.applyMatrix( _m1 );
@@ -251,6 +253,10 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 	},
 
+	/**
+	 * 更改当前几何体的朝向为参数中的点
+	 * @param {Vector3} vector 朝向的点
+	 */
 	lookAt: function ( vector ) {
 
 		_obj.lookAt( vector );
