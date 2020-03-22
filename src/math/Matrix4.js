@@ -747,6 +747,8 @@ Object.assign( Matrix4.prototype, {
 	/**
 	 * makeTranslation方法依据x, y, z生成平移矩阵.
 	 * 用法：左乘目标向量，实现向量平移
+	 * 4阶矩阵中最后一列是平移因子，最后一行是整体绽放因子，
+	 * 左上3阶对角线上分别表示对xyz的缩放，上三角和下三角表示旋转。
 	 * @param {number} x
 	 * @param {number} y
 	 * @param {number} z

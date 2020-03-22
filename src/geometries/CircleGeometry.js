@@ -11,7 +11,13 @@ import { Vector3 } from '../math/Vector3.js';
 import { Vector2 } from '../math/Vector2.js';
 
 // CircleGeometry
-
+/**
+ * 圆形几何体
+ * @param {*} radius 圆形的半径，默认值为1
+ * @param {*} segments 分段（三角面）的数量，最小值为3，默认值为8。
+ * @param {*} thetaStart 第一个分段的起始角度，默认为0
+ * @param {*} thetaLength 圆形扇区的中心角，通常被称为“θ”（西塔）。默认值是2*Pi，这使其成为一个完整的圆。
+ */
 function CircleGeometry( radius, segments, thetaStart, thetaLength ) {
 
 	Geometry.call( this );
@@ -34,7 +40,13 @@ CircleGeometry.prototype = Object.create( Geometry.prototype );
 CircleGeometry.prototype.constructor = CircleGeometry;
 
 // CircleBufferGeometry
-
+/**
+ * 圆形缓冲几何体
+ * @param {number} radius 圆形的半径，默认值为1
+ * @param {number} segments 分段（三角面）的数量，最小值为3，默认值为8。
+ * @param {number} thetaStart 第一个分段的起始角度，默认为0 ,逆时针方向
+ * @param {number} thetaLength 
+ */
 function CircleBufferGeometry( radius, segments, thetaStart, thetaLength ) {
 
 	BufferGeometry.call( this );
